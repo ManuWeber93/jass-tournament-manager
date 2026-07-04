@@ -115,6 +115,27 @@ Features:
 - Configurable score visibility
 - Excel import for historical data (see backend service)
 
+Frontend component structure:
+- Views are XAML pages and controls. They define layout, visual states, bindings, and navigation entry points, but they should not contain business logic or direct HTTP calls.
+- ViewModels contain presentation state, commands, validation that is relevant for the UI, and orchestration of user interactions. They communicate with application-facing services through interfaces.
+- Services provide feature-oriented operations for the app, for example authentication, user lookup, tournament templates, tournaments, pairings, and score entry. They hide transport details from ViewModels.
+- API clients are responsible for REST communication with the ASP.NET Core backend. They use shared DTOs from `JassTournamentManager.Contracts` and typed or named `HttpClient` instances.
+- Cross-cutting infrastructure handles concerns such as token storage, authorization headers, refresh-token retries, API base-address selection, logging, and future offline/cache behavior.
+- The native MAUI app communicates directly with the backend via `HttpClient`. Browser-specific concerns such as CORS are intentionally not part of the native client architecture.
+
+```mermaid
+flowchart LR
+    View[View / XAML Page] -->|Bindings and commands| ViewModel[ViewModel]
+    ViewModel -->|Feature use cases| Service[App Service]
+    Service -->|DTO-based operations| ApiClient[API Client]
+    ApiClient -->|Named HttpClient| Handler[AuthenticatingHttpHandler]
+    Handler -->|Bearer token / refresh retry| Backend[ASP.NET Core API]
+    Handler --> TokenStore[TokenStore]
+    TokenStore --> SecureStorage[MAUI SecureStorage]
+    ApiClient --> Contracts[Shared Contracts]
+    Backend --> Contracts
+```
+
 ---
 
 ### Backend (Application Layer)
@@ -198,7 +219,7 @@ Authentication & authorization:
 
 API security:
 - HTTPS/TLS enforced
-- Proper CORS configuration
+- Native clients call the API directly via HTTP clients; CORS is not required unless a browser-based frontend is introduced later.
 - Input validation on both client and server
 
 Data protection / privacy:
