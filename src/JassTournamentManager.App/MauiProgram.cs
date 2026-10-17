@@ -27,9 +27,10 @@ public static class MauiProgram
 
         builder.Services.AddTransient<AuthenticationViewModel>();
         builder.Services.AddTransient<LoginFormViewModel>();
-        builder.Services.AddTransient<RegisterFlowViewModel>();
+        builder.Services.AddTransient(_ => new RegisterFlowViewModel());
 
         builder.Services.AddSingleton(new ApiOptions());
+        builder.Services.AddSingleton<ISecureStorage>(SecureStorage.Default);
         builder.Services.AddSingleton<ITokenStore, SecureTokenStore>();
         builder.Services.AddTransient<AuthenticatingHttpHandler>();
 

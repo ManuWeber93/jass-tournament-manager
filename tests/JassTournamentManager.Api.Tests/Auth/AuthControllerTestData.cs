@@ -10,7 +10,7 @@ namespace JassTournamentManager.Api.Tests.Auth
         public static string CreateAccessToken() => "access-token";
 
         public static DateTimeOffset CreateAccessTokenExpiresAt() => DateTimeOffset.Now.AddMinutes(15);
-        
+
         public static string CreateRefreshToken() => "refresh-token";
 
         public static DateTimeOffset CreateRefreshTokenExpiresAt() => new(2043, 11, 30, 2, 0, 0, TimeSpan.Zero);

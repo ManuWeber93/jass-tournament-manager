@@ -8,6 +8,7 @@ namespace JassTournamentManager.App.Infrastructure.Api;
 
 public sealed class AuthenticatingHttpHandler : DelegatingHandler
 {
+    private const string refreshRequestUrl = "api/auth/refresh";
     private readonly ITokenStore tokenStore;
 
     public AuthenticatingHttpHandler(ITokenStore tokenStore)
@@ -60,7 +61,7 @@ public sealed class AuthenticatingHttpHandler : DelegatingHandler
             return null;
         }
 
-        AuthResponse? refreshedSession = await TryRefreshSessionAsync(refreshToken, cancellationToken);
+        AuthResponse? refreshedSession = await TryRefreshSessionAsync(originalRequest.RequestUri!, refreshToken, cancellationToken);
         if (refreshedSession is null)
         {
             await tokenStore.ClearAsync(cancellationToken);
@@ -75,9 +76,9 @@ public sealed class AuthenticatingHttpHandler : DelegatingHandler
         return retryRequest;
     }
 
-    private async Task<AuthResponse?> TryRefreshSessionAsync(string refreshToken, CancellationToken cancellationToken)
+    private async Task<AuthResponse?> TryRefreshSessionAsync(Uri originalRequestUri, string refreshToken, CancellationToken cancellationToken)
     {
-        using var refreshRequest = new HttpRequestMessage(HttpMethod.Post, "api/auth/refresh")
+        using var refreshRequest = new HttpRequestMessage(HttpMethod.Post, new Uri(originalRequestUri, "/" + refreshRequestUrl))
         {
             Content = JsonContent.Create(new RefreshSessionRequest(refreshToken))
         };
@@ -94,7 +95,7 @@ public sealed class AuthenticatingHttpHandler : DelegatingHandler
     private static bool IsRefreshRequest(HttpRequestMessage request)
     {
         string requestPath = request.RequestUri?.OriginalString ?? string.Empty;
-        return requestPath.Contains("api/auth/refresh", StringComparison.OrdinalIgnoreCase);
+        return requestPath.Contains(refreshRequestUrl, StringComparison.OrdinalIgnoreCase);
     }
 
     private static async Task<HttpRequestMessage> CloneRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)

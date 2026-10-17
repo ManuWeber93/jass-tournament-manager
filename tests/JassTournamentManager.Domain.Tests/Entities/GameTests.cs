@@ -73,7 +73,7 @@ namespace JassTournamentManager.Domain.Tests.Entities
         {
             var game = GameTestData.CreateGame();
             var score = GameTestData.CreateGameScore();
-            
+
             game.SetScore(score);
 
             game.Score.Should().Be(score);

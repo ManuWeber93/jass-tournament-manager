@@ -24,6 +24,12 @@
 *.pdb
 *.cache
 
+# Test and coverage results
+TestResults/
+AppTestResults/
+coverage-report/
+app-coverage-report/
+
 # NuGet
 *.nupkg
 

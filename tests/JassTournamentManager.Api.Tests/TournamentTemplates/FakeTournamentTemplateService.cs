@@ -10,7 +10,7 @@ namespace JassTournamentManager.Api.Tests.TournamentTemplates
 
         public Result<TournamentTemplateResponse>? GetByIdAsyncResult { get; set; }
 
-        public Result<TournamentTemplateResponse>? GetForCurrentUserAsyncResult {  get; set; }
+        public Result<TournamentTemplateResponse>? GetForCurrentUserAsyncResult { get; set; }
 
         public CreateTournamentTemplateRequest? ReceivedCreateAsyncRequest { get; private set; }
 

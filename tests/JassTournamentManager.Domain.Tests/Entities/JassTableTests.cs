@@ -108,7 +108,7 @@ namespace JassTournamentManager.Domain.Tests.Entities
         {
             var jassTable = JassTableTestData.CreateJassTable();
             var negativeDisplayOrder = -1;
-            
+
             Action act = () => jassTable.ChangeDisplayOrder(negativeDisplayOrder);
 
             act.Should().Throw<ArgumentOutOfRangeException>();

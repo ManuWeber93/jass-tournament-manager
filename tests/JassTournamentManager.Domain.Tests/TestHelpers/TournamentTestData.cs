@@ -25,7 +25,7 @@ namespace JassTournamentManager.Domain.Tests.TestHelpers
                 CreateTournamentDate(),
                 CreateTournamentCode());
 
-        public static Tournament CreateTournament() => 
+        public static Tournament CreateTournament() =>
             new(
                 UserTestData.CreateUserId(),
                 CreateTournamentDetails(),

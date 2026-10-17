@@ -10,7 +10,7 @@ namespace JassTournamentManager.Infrastructure.Persistence
         }
 
         public DbSet<User> Users => Set<User>();
-        
+
         public DbSet<TournamentTemplate> TournamentTemplates => Set<TournamentTemplate>();
 
         public DbSet<JassTable> JassTables => Set<JassTable>();

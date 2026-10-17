@@ -5,7 +5,7 @@ namespace JassTournamentManager.Domain.Tests.TestHelpers
     internal static class JassTableTestData
     {
         public static Guid CreateJassTableId() => Guid.NewGuid();
-        
+
         public static string CreateJassTableName() => "Nyffis";
 
         public static int CreateDisplayOrder() => 1;

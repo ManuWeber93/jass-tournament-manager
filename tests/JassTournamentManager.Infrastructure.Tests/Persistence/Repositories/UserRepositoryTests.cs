@@ -105,7 +105,7 @@ namespace JassTournamentManager.Infrastructure.Tests.Persistence.Repositories
             var repository = new UserRepository(assertionContext);
 
             var exists = await repository.ExistsAsync(missingUserId, CancellationToken.None);
-            
+
             exists.Should().BeFalse();
         }
 

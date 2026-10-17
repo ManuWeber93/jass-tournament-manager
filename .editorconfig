@@ -1,0 +1,17 @@
+root = true
+
+[*.cs]
+indent_style = space
+indent_size = 4
+tab_width = 4
+
+csharp_new_line_before_open_brace = all
+csharp_indent_case_contents = true
+csharp_indent_switch_labels = true
+csharp_style_namespace_declarations = block_scoped:silent
+csharp_prefer_braces = true:warning
+dotnet_diagnostic.IDE0011.severity = warning
+
+# Preserve generated migration code rather than applying manual style rules.
+[**/Persistence/Migrations/*.cs]
+generated_code = true

@@ -1,0 +1,141 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Restore
+        run: dotnet restore JassTournamentManager.Backend.slnx
+
+      - name: Verify formatting and code style
+        run: dotnet format JassTournamentManager.Backend.slnx --verify-no-changes --no-restore
+
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Restore
+        run: dotnet restore JassTournamentManager.Backend.slnx
+
+      - name: Build
+        run: dotnet build JassTournamentManager.Backend.slnx --configuration Release --no-restore
+
+      - name: Test with coverage
+        run: >
+          dotnet test JassTournamentManager.Backend.slnx
+          --configuration Release
+          --no-build
+          --collect:"XPlat Code Coverage"
+          --settings ./coverlet-coverage.runsettings
+          --logger trx
+          --results-directory ./TestResults
+
+      - name: Upload backend test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: backend-test-results
+          path: ./TestResults
+
+      - name: Restore local tools
+        run: dotnet tool restore
+
+      - name: Generate coverage report
+        run: >
+          dotnet tool run reportgenerator
+          -reports:"./TestResults/**/coverage.cobertura.xml"
+          -targetdir:"./coverage-report"
+          -reporttypes:"Html;Cobertura;MarkdownSummaryGithub"
+
+      - name: Publish coverage to job summary
+        run: cat ./coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-report
+          path: ./coverage-report
+
+  app-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
+          cache-dependency-path: '**/*.csproj'
+
+      - name: Run platform-neutral app tests with coverage
+        run: >
+          dotnet test tests/JassTournamentManager.App.Tests/JassTournamentManager.App.Tests.csproj
+          --configuration Release
+          -p:AppTestsOnly=true
+          --collect:"XPlat Code Coverage"
+          --settings ./coverlet-coverage.runsettings
+          --logger "trx;LogFileName=app-tests.trx"
+          --results-directory ./AppTestResults
+
+      - name: Restore local tools
+        run: dotnet tool restore
+
+      - name: Generate app coverage report
+        run: >
+          dotnet tool run reportgenerator
+          -reports:"./AppTestResults/**/coverage.cobertura.xml"
+          -targetdir:"./app-coverage-report"
+          -reporttypes:"Html;Cobertura;MarkdownSummaryGithub"
+
+      - name: Publish app coverage to job summary
+        run: cat ./app-coverage-report/SummaryGithub.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload app test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: app-test-results
+          path: ./AppTestResults
+
+      - name: Upload app coverage report
+        uses: actions/upload-artifact@v6
+        with:
+          name: app-coverage-report
+          path: ./app-coverage-report

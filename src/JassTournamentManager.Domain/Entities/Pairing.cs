@@ -60,7 +60,7 @@ namespace JassTournamentManager.Domain.Entities
             {
                 throw new InvalidOperationException($"Game number {game.GameNumber} already exists in the pairing.");
             }
-            
+
             _games.Add(game);
             MarkAsUpdated();
         }

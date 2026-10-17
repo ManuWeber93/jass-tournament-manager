@@ -11,7 +11,7 @@
         protected BaseEntity()
         {
             DateTimeOffset now = DateTimeOffset.UtcNow;
-            
+
             Id = Guid.NewGuid();
             CreatedAt = now;
             UpdatedAt = now;

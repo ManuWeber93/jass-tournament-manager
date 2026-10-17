@@ -11,7 +11,7 @@ namespace JassTournamentManager.Domain.Tests.Entities
         public void Constructor_WithBlankFirstName_ThrowsArgumentException()
         {
             var blankFirstName = " ";
-            
+
             Action act = () => new User(
                 UserTestData.CreateEmail(),
                 UserTestData.CreatePasswordHash(),

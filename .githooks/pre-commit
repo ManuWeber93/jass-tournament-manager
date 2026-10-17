@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+fail() {
+    printf 'pre-commit: %s\n' "$*" >&2
+    exit 1
+}
+
+root=$(git rev-parse --show-toplevel)
+cd "$root"
+solution=JassTournamentManager.Backend.slnx
+[[ -f "$solution" ]] || fail "Backend solution not found."
+
+project_directories=()
+while IFS= read -r project || [[ -n "$project" ]]; do
+    project_directories+=("${project%/*}/")
+done < <(sed -n 's/.*<Project Path="\([^"]*\)".*/\1/p' "$solution" | tr -d '\r')
+[[ ${#project_directories[@]} -gt 0 ]] || fail "No backend projects could be read from the solution."
+
+is_backend_source() {
+    local path=$1 directory
+    case "$path" in
+        *.cs) ;;
+        *) return 1 ;;
+    esac
+    case "$path" in
+        */bin/*|*/obj/*|*/Persistence/Migrations/*) return 1 ;;
+    esac
+    for directory in "${project_directories[@]}"; do
+        [[ "$path" == "$directory"* ]] && return 0
+    done
+    return 1
+}
+
+files=()
+while IFS= read -r -d '' path; do
+    if is_backend_source "$path"; then
+        files+=("$path")
+    fi
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+[[ ${#files[@]} -gt 0 ]] || exit 0
+
+# Check every file before formatting any file. Never stash or stage changes.
+for path in "${files[@]}"; do
+    git diff --quiet -- "$path" || fail "'$path' has unstaged changes. Stage or set aside those changes before committing."
+done
+
+command -v dotnet >/dev/null 2>&1 || fail "The .NET SDK is required. Install it and restore the backend solution."
+printf 'pre-commit: Formatting %s staged backend C# file(s)...\n' "${#files[@]}"
+dotnet format "$solution" --no-restore --include "${files[@]}" || fail "Formatting failed. Check the .NET SDK and run 'dotnet restore $solution'. Review any changes before retrying."
+
+if ! git diff --quiet -- "${files[@]}"; then
+    fail "Formatting changed files. Review the diff, stage the formatting changes, and commit again. Nothing was staged automatically."
+fi

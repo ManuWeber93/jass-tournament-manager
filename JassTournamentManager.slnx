@@ -11,6 +11,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/JassTournamentManager.Api.Tests/JassTournamentManager.Api.Tests.csproj" />
+    <Project Path="tests/JassTournamentManager.App.Tests/JassTournamentManager.App.Tests.csproj" />
     <Project Path="tests/JassTournamentManager.Application.Tests/JassTournamentManager.Application.Tests.csproj" />
     <Project Path="tests/JassTournamentManager.Domain.Tests/JassTournamentManager.Domain.Tests.csproj" />
     <Project Path="tests/JassTournamentManager.Infrastructure.Tests/JassTournamentManager.Infrastructure.Tests.csproj" />

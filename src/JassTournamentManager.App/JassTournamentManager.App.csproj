@@ -4,6 +4,9 @@
 		<TargetFrameworks>net10.0-android</TargetFrameworks>
 		<TargetFrameworks Condition="!$([MSBuild]::IsOSPlatform('linux'))">$(TargetFrameworks);net10.0-ios;net10.0-maccatalyst</TargetFrameworks>
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>$(TargetFrameworks);net10.0</TargetFrameworks>
+		<!-- Restrict restore and tests to the neutral target without requiring MAUI workloads. -->
+		<TargetFrameworks Condition="'$(AppTestsOnly)' == 'true'">net10.0</TargetFrameworks>
 
 		<!-- Note for MacCatalyst:
 		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
@@ -12,11 +15,11 @@
 		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
-		<OutputType>Exe</OutputType>
+		<OutputType Condition="'$(TargetFramework)' != 'net10.0'">Exe</OutputType>
 		<RootNamespace>JassTournamentManager.App</RootNamespace>
-		<UseMaui>true</UseMaui>
+		<UseMaui Condition="'$(TargetFramework)' != 'net10.0' and '$(AppTestsOnly)' != 'true'">true</UseMaui>
 		<MauiVersion>10.0.71</MauiVersion>
-		<SingleProject>true</SingleProject>
+		<SingleProject Condition="'$(TargetFramework)' != 'net10.0' and '$(AppTestsOnly)' != 'true'">true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
@@ -73,10 +76,15 @@
 	<ItemGroup>
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="10.0.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="$(MauiVersion)" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" Condition="'$(TargetFramework)' != 'net10.0'" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
-		<PackageReference Include="UraniumUI" Version="3.0.0" />
-		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />
+		<PackageReference Include="UraniumUI" Version="3.0.0" Condition="'$(TargetFramework)' != 'net10.0'" />
+		<PackageReference Include="UraniumUI.Material" Version="3.0.0" Condition="'$(TargetFramework)' != 'net10.0'" />
+	</ItemGroup>
+
+	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+		<Compile Remove="Platforms\**\*.cs;**\*.xaml.cs;MauiProgram.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

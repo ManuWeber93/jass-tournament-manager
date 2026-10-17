@@ -11,7 +11,7 @@ namespace JassTournamentManager.Application.Tests.Users
 
         public Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
         {
-            return Task.FromResult(_users.SingleOrDefault(user =>  user.Id == id));
+            return Task.FromResult(_users.SingleOrDefault(user => user.Id == id));
         }
 
         public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken)

@@ -10,15 +10,21 @@ public sealed class SecureTokenStore : ITokenStore
     private const string AccessTokenExpiresAtKey = "auth.accessTokenExpiresAt";
     private const string RefreshTokenKey = "auth.refreshToken";
     private const string RefreshTokenExpiresAtKey = "auth.refreshTokenExpiresAt";
+    private readonly ISecureStorage secureStorage;
+
+    public SecureTokenStore(ISecureStorage secureStorage)
+    {
+        this.secureStorage = secureStorage ?? throw new ArgumentNullException(nameof(secureStorage));
+    }
 
     public async Task<StoredAuthTokens?> GetTokensAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        string? accessToken = await SecureStorage.GetAsync(AccessTokenKey);
-        string? accessTokenExpiresAtValue = await SecureStorage.GetAsync(AccessTokenExpiresAtKey);
-        string? refreshToken = await SecureStorage.GetAsync(RefreshTokenKey);
-        string? refreshTokenExpiresAtValue = await SecureStorage.GetAsync(RefreshTokenExpiresAtKey);
+        string? accessToken = await secureStorage.GetAsync(AccessTokenKey);
+        string? accessTokenExpiresAtValue = await secureStorage.GetAsync(AccessTokenExpiresAtKey);
+        string? refreshToken = await secureStorage.GetAsync(RefreshTokenKey);
+        string? refreshTokenExpiresAtValue = await secureStorage.GetAsync(RefreshTokenExpiresAtKey);
 
         if (string.IsNullOrWhiteSpace(accessToken) ||
             string.IsNullOrWhiteSpace(accessTokenExpiresAtValue) ||
@@ -40,13 +46,13 @@ public sealed class SecureTokenStore : ITokenStore
     public async Task<string?> GetAccessTokenAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return await SecureStorage.GetAsync(AccessTokenKey);
+        return await secureStorage.GetAsync(AccessTokenKey);
     }
 
     public async Task<string?> GetRefreshTokenAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return await SecureStorage.GetAsync(RefreshTokenKey);
+        return await secureStorage.GetAsync(RefreshTokenKey);
     }
 
     public Task SetTokensAsync(AuthResponse authResponse, CancellationToken cancellationToken = default)
@@ -67,20 +73,20 @@ public sealed class SecureTokenStore : ITokenStore
         ArgumentNullException.ThrowIfNull(tokens);
         cancellationToken.ThrowIfCancellationRequested();
 
-        await SecureStorage.SetAsync(AccessTokenKey, tokens.AccessToken);
-        await SecureStorage.SetAsync(AccessTokenExpiresAtKey, FormatDateTimeOffset(tokens.AccessTokenExpiresAt));
-        await SecureStorage.SetAsync(RefreshTokenKey, tokens.RefreshToken);
-        await SecureStorage.SetAsync(RefreshTokenExpiresAtKey, FormatDateTimeOffset(tokens.RefreshTokenExpiresAt));
+        await secureStorage.SetAsync(AccessTokenKey, tokens.AccessToken);
+        await secureStorage.SetAsync(AccessTokenExpiresAtKey, FormatDateTimeOffset(tokens.AccessTokenExpiresAt));
+        await secureStorage.SetAsync(RefreshTokenKey, tokens.RefreshToken);
+        await secureStorage.SetAsync(RefreshTokenExpiresAtKey, FormatDateTimeOffset(tokens.RefreshTokenExpiresAt));
     }
 
     public Task ClearAsync(CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        SecureStorage.Remove(AccessTokenKey);
-        SecureStorage.Remove(AccessTokenExpiresAtKey);
-        SecureStorage.Remove(RefreshTokenKey);
-        SecureStorage.Remove(RefreshTokenExpiresAtKey);
+        secureStorage.Remove(AccessTokenKey);
+        secureStorage.Remove(AccessTokenExpiresAtKey);
+        secureStorage.Remove(RefreshTokenKey);
+        secureStorage.Remove(RefreshTokenExpiresAtKey);
 
         return Task.CompletedTask;
     }

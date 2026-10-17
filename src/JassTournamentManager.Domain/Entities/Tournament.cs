@@ -11,7 +11,7 @@ namespace JassTournamentManager.Domain.Entities
         private readonly List<Round> _rounds = [];
         private readonly List<TournamentParticipant> _participants = [];
 
-        public Guid OrganizerId {  get; private set; }
+        public Guid OrganizerId { get; private set; }
 
         public TournamentDetails Details { get; private set; } = null!;
 
@@ -69,7 +69,7 @@ namespace JassTournamentManager.Domain.Entities
         {
             var roundToRemove = _rounds.FirstOrDefault(r => r.Id == roundId)
                 ?? throw new ArgumentException($"Round with id {roundId} not found in tournament.");
-            
+
             _rounds.Remove(roundToRemove);
             UpdateNumberOfRoundsInConfig();
             MarkAsUpdated();
@@ -102,7 +102,7 @@ namespace JassTournamentManager.Domain.Entities
         {
             var participantToRemove = _participants.FirstOrDefault(p => p.Id == participantId)
                 ?? throw new ArgumentException($"Participant with id {participantId} not found in tournament.");
-            
+
             _participants.Remove(participantToRemove);
             MarkAsUpdated();
         }
@@ -110,7 +110,7 @@ namespace JassTournamentManager.Domain.Entities
         public void UpdateDetails(TournamentDetails newDetails)
         {
             ArgumentNullException.ThrowIfNull(newDetails);
-            
+
             Details = newDetails;
             MarkAsUpdated();
         }

@@ -44,7 +44,7 @@ namespace JassTournamentManager.Infrastructure.Auth
         {
             var bytes = RandomNumberGenerator.GetBytes(64);
             string tokenString = Base64UrlEncoder.Encode(bytes);
-            
+
             string tokenHash = HashRefreshToken(tokenString);
 
             var expiresAt = DateTimeOffset.UtcNow.AddDays(_jwtOptions.RefreshTokenDays);

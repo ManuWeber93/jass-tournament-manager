@@ -53,9 +53,15 @@ namespace JassTournamentManager.App.Features.Authentication
         [NotifyPropertyChangedFor(nameof(IsRegisterFormInvalid))]
         public partial string InvalidRegisterFormErrorMessage { get; set; } = string.Empty;
 
-        public RegisterFlowViewModel()
+        public RegisterFlowViewModel() : this(CreateDummyClaimableUsers())
         {
-            LoadDummyClaimableUsers();
+        }
+
+        public RegisterFlowViewModel(IEnumerable<ClaimableUserListItem> claimableUsers)
+        {
+            ArgumentNullException.ThrowIfNull(claimableUsers);
+            allClaimableUsers.AddRange(claimableUsers);
+            ApplyClaimableUserFilter();
         }
 
         public bool IsPreviousParticipationQuestionVisible => CurrentRegisterStep == RegisterStep.PreviousParticipationQuestion;
@@ -146,15 +152,14 @@ namespace JassTournamentManager.App.Features.Authentication
             CurrentRegisterStep = RegisterStep.RegistrationForm;
         }
 
-        private void LoadDummyClaimableUsers()
+        private static IEnumerable<ClaimableUserListItem> CreateDummyClaimableUsers()
         {
-            allClaimableUsers.Clear();
-
-            allClaimableUsers.Add(new(Guid.NewGuid(), "Max", "Muster"));
-            allClaimableUsers.Add(new(Guid.NewGuid(), "Maja", "Meisterhans"));
-            allClaimableUsers.Add(new(Guid.NewGuid(), "Seraina", "Huber"));
-
-            ApplyClaimableUserFilter();
+            return
+            [
+                new(Guid.NewGuid(), "Max", "Muster"),
+                new(Guid.NewGuid(), "Maja", "Meisterhans"),
+                new(Guid.NewGuid(), "Seraina", "Huber")
+            ];
         }
 
         private void ValidateIfPasswordsMatch()

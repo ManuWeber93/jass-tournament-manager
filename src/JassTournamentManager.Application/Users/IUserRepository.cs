@@ -7,7 +7,7 @@ namespace JassTournamentManager.Application.Users
         Task<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
         Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken);
-        
+
         Task<bool> ExistsAsync(Guid id, CancellationToken cancellationToken);
 
         Task<bool> ExistsByEmailAsync(string email, CancellationToken cancellationToken);

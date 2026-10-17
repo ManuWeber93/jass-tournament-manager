@@ -80,7 +80,7 @@ namespace JassTournamentManager.Application.Tests.TournamentTemplates
 
             TournamentTemplate tournamentTemplate = TournamentTemplateTestData.CreateTournamentTemplate(user.Id);
             await _tournamentTemplateRepository.AddAsync(tournamentTemplate, CancellationToken.None);
-            
+
             CreateTournamentTemplateRequest request = TournamentTemplateTestData.CreateCreateTournamentTemplateRequest();
             Result<TournamentTemplateResponse> result = await _tournamentTemplateService.CreateAsync(request, CancellationToken.None);
 

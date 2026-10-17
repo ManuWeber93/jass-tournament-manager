@@ -28,7 +28,7 @@ namespace JassTournamentManager.Domain.Entities
 
         public Guid? MergeTargetUserId { get; private set; }
 
-        public Guid? MergedBy {  get; private set; }
+        public Guid? MergedBy { get; private set; }
 
         public DateTimeOffset? MergedAt { get; private set; }
 
@@ -103,7 +103,7 @@ namespace JassTournamentManager.Domain.Entities
             {
                 throw new InvalidOperationException("User has already been merged into different user.");
             }
-            
+
             Guard.AgainstEmptyGuid(mergeTargetUserId, nameof(mergeTargetUserId));
             Guard.AgainstEmptyGuid(mergedByUserId, nameof(mergedByUserId));
 

@@ -6,7 +6,7 @@ namespace JassTournamentManager.Api.Tests.Users
 {
     internal sealed class FakeUserService : IUserService
     {
-        public Result<UserResponse>? CreateAsyncResult {  get; set; }
+        public Result<UserResponse>? CreateAsyncResult { get; set; }
 
         public Result<UserResponse>? GetByIdAsyncResult { get; set; }
 

@@ -70,7 +70,10 @@
             get
             {
                 if (IsSuccess || _error is null)
+                {
                     throw new InvalidOperationException("The error of a successful result cannot be accessed.");
+                }
+
                 return _error;
             }
         }
