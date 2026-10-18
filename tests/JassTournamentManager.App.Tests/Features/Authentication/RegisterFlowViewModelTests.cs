@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using JassTournamentManager.App.Features.Authentication;
 using JassTournamentManager.App.Features.Authentication.Models;
+using JassTournamentManager.App.Tests.Support;
 using Xunit;
 
 namespace JassTournamentManager.App.Tests.Features.Authentication
@@ -10,7 +11,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [Fact]
         public void Constructor_ByDefault_InitializesEmptyFormAndQuestionStep()
         {
-            var viewModel = new RegisterFlowViewModel();
+            var viewModel = new RegisterFlowViewModel(new FakeAuthSession());
 
             viewModel.CurrentRegisterStep.Should().Be(RegisterStep.PreviousParticipationQuestion);
             viewModel.IsPreviousParticipationQuestionVisible.Should().BeTrue();
@@ -27,6 +28,9 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
             viewModel.InvalidRegisterFormErrorMessage.Should().BeEmpty();
             viewModel.IsRegisterPasswordMismatch.Should().BeFalse();
             viewModel.IsRegisterFormInvalid.Should().BeFalse();
+            viewModel.FilteredClaimableUsers.Should().BeEmpty();
+            viewModel.IsBusy.Should().BeFalse();
+            viewModel.IsNotBusy.Should().BeTrue();
             viewModel.ContinueWithSelectedClaimableUserCommand.CanExecute(null).Should().BeFalse();
         }
 
@@ -35,7 +39,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         {
             var users = CreateUsers();
 
-            var viewModel = new RegisterFlowViewModel(users);
+            var viewModel = new RegisterFlowViewModel(new FakeAuthSession(), users);
 
             viewModel.FilteredClaimableUsers.Should().Equal(users.OrderBy(user => user.DisplayName));
         }
@@ -58,7 +62,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void FilterText_WithSearchText_FiltersAndPreservesOrdering(string filter, int expectedCount)
         {
             var users = CreateUsers();
-            var viewModel = new RegisterFlowViewModel(users);
+            var viewModel = new RegisterFlowViewModel(new FakeAuthSession(), users);
             var collection = viewModel.FilteredClaimableUsers;
             var expectedUsers = users
                 .Where(user => user.DisplayName.Contains(filter.Trim(), StringComparison.CurrentCultureIgnoreCase))
@@ -76,7 +80,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void FilterText_WhenCleared_RestoresAllArrangedUsers()
         {
             var users = CreateUsers();
-            var viewModel = new RegisterFlowViewModel(users);
+            var viewModel = new RegisterFlowViewModel(new FakeAuthSession(), users);
             viewModel.ClaimableUsersFilterText = users[0].FirstName;
 
             viewModel.ClaimableUsersFilterText = string.Empty;
@@ -88,7 +92,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void FilterText_WhenChanged_ClearsEvenMatchingSelectionAndDisablesContinue()
         {
             var user = CreateUsers()[0];
-            var viewModel = new RegisterFlowViewModel(new[] { user });
+            var viewModel = new RegisterFlowViewModel(new FakeAuthSession(), new[] { user });
             viewModel.SelectedClaimableUser = user;
             var changedProperties = new List<string?>();
             var canExecuteChangedCount = 0;
@@ -174,7 +178,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void ContinueWithSelectedClaimableUserCommand_WithSelection_PrefillsNamesAndShowsForm()
         {
             var user = CreateUsers()[0];
-            var viewModel = new RegisterFlowViewModel(new[] { user });
+            var viewModel = new RegisterFlowViewModel(new FakeAuthSession(), new[] { user });
             viewModel.SelectedClaimableUser = user;
             viewModel.FirstName = "Previous";
             viewModel.LastName = "Values";
@@ -237,7 +241,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
 
         private static RegisterFlowViewModel CreateViewModel()
         {
-            return new(Array.Empty<ClaimableUserListItem>());
+            return new(new FakeAuthSession(), Array.Empty<ClaimableUserListItem>());
         }
 
         private static ClaimableUserListItem[] CreateUsers()

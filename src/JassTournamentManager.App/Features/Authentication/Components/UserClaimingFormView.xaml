@@ -6,6 +6,7 @@
     xmlns:resources="clr-namespace:JassTournamentManager.App.Resources.Localization">
 
     <VerticalStackLayout Spacing="16">
+        <Label Text="{x:Static resources:AppResources.Register_UserClaimingUnavailable}" Style="{StaticResource MutedLabel}" />
         <SearchBar
             Placeholder="{x:Static resources:AppResources.Register_SearchPlayer}"
             Text="{Binding ClaimableUsersFilterText}" />

@@ -25,7 +25,7 @@ namespace JassTournamentManager.App.Features.Authentication
         [RelayCommand]
         private void ShowLogin()
         {
-            if (LoginForm.IsBusy)
+            if (LoginForm.IsBusy || RegisterFlow.IsBusy)
             {
                 return;
             }
@@ -35,7 +35,7 @@ namespace JassTournamentManager.App.Features.Authentication
         [RelayCommand]
         private void ShowRegister()
         {
-            if (LoginForm.IsBusy)
+            if (LoginForm.IsBusy || RegisterFlow.IsBusy)
             {
                 return;
             }

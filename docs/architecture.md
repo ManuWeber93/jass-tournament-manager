@@ -138,6 +138,25 @@ flowchart LR
 
 ---
 
+### App Authentication and Session Handling
+
+This section describes the technical implementation. User-visible behavior and current feature limitations are maintained in [Authentication](features/authentication.md); manual verification is documented in [Manual authentication tests](testing/authentication.md).
+
+- Login and registration return tokens and user data directly. Registration does not require an additional login request.
+- Registration reuses the existing `LoginResult` and shared `AuthSession` persistence path. Tokens are stored securely before the authenticated user is published and authenticated navigation begins.
+- Passwords are not persisted. Registration password fields are cleared after success or a session-storage failure following account creation.
+- Login and logout use a dedicated HTTP client without automatic refresh. Protected API requests use `AuthenticatingHttpHandler` for bearer authentication and refresh retries.
+- Successful authentication issues an access token and a refresh token. Refresh tokens are rotated when a session is refreshed, invalidating the previous refresh token; the backend stores only their hashes.
+- Logout attempts to revoke the latest stored refresh token before clearing local authentication data. Failed remote revocation does not prevent local logout; failed secure-storage cleanup is reported as a failure.
+- Secure token persistence does not currently include automatic session restoration when the app starts.
+
+Local API configuration:
+
+- `ApiOptions` selects `localhost:5272` on Windows and `10.0.2.2:5272` for the Android emulator.
+- Device connectivity and platform HTTP/HTTPS settings must be configured for the target environment.
+
+---
+
 ### Backend (Application Layer)
 
 Services and responsibilities:

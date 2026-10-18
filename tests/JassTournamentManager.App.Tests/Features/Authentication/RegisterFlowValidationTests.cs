@@ -2,6 +2,7 @@
 using JassTournamentManager.App.Features.Authentication;
 using JassTournamentManager.App.Features.Authentication.Models;
 using JassTournamentManager.App.Resources.Localization;
+using JassTournamentManager.App.Tests.Support;
 using Xunit;
 
 namespace JassTournamentManager.App.Tests.Features.Authentication
@@ -93,12 +94,12 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [InlineData(true, "   ")]
         [InlineData(false, "")]
         [InlineData(false, "\t")]
-        public void RegisterCommand_WithBlankName_ShowsInvalidFormResource(bool firstName, string value)
+        public async Task RegisterCommand_WithBlankName_ShowsInvalidFormResource(bool firstName, string value)
         {
             var viewModel = CreateValidViewModel();
             SetName(viewModel, firstName, value);
 
-            AssertInvalidRegistration(viewModel);
+            await AssertInvalidRegistration(viewModel);
         }
 
         [Theory]
@@ -108,25 +109,25 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [InlineData(false, 1, true)]
         [InlineData(false, 50, true)]
         [InlineData(false, 51, false)]
-        public void RegisterCommand_WithNameLength_ValidatesBoundary(bool firstName, int length, bool valid)
+        public async Task RegisterCommand_WithNameLength_ValidatesBoundary(bool firstName, int length, bool valid)
         {
             var viewModel = CreateValidViewModel();
             SetName(viewModel, firstName, new string('a', length));
 
-            AssertRegistrationResult(viewModel, valid);
+            await AssertRegistrationResult(viewModel, valid);
         }
 
         [Theory]
         [InlineData(319, true)]
         [InlineData(320, true)]
         [InlineData(321, false)]
-        public void RegisterCommand_WithEmailLength_ValidatesBoundary(int length, bool valid)
+        public async Task RegisterCommand_WithEmailLength_ValidatesBoundary(int length, bool valid)
         {
             var viewModel = CreateValidViewModel();
             const string suffix = "@example.org";
             viewModel.Email = new string('a', length - suffix.Length) + suffix;
 
-            AssertRegistrationResult(viewModel, valid);
+            await AssertRegistrationResult(viewModel, valid);
         }
 
         [Theory]
@@ -136,25 +137,25 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [InlineData("player@")]
         [InlineData("@example.org")]
         [InlineData("Player <player@example.org>")]
-        [InlineData(" player@example.org ")]
-        public void RegisterCommand_WithInvalidEmail_ShowsInvalidFormResource(string email)
+        public async Task RegisterCommand_WithInvalidEmail_ShowsInvalidFormResource(string email)
         {
             var viewModel = CreateValidViewModel();
             viewModel.Email = email;
 
-            AssertInvalidRegistration(viewModel);
+            await AssertInvalidRegistration(viewModel);
         }
 
         [Theory]
         [InlineData("player+event@example.org")]
         [InlineData("PLAYER@EXAMPLE.ORG")]
         [InlineData("first.last@example.org")]
-        public void RegisterCommand_WithValidEmail_ClearsPreviousError(string email)
+        [InlineData(" player@example.org ")]
+        public async Task RegisterCommand_WithValidEmail_ClearsPreviousError(string email)
         {
             var viewModel = CreateValidViewModel();
             viewModel.Email = email;
 
-            AssertRegistrationResult(viewModel, true);
+            await AssertRegistrationResult(viewModel, true);
         }
 
         [Theory]
@@ -167,13 +168,13 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [InlineData("Abcdef1_", false)]
         [InlineData("Abcdef1 ", false)]
         [InlineData("1234567!", true)]
-        public void RegisterCommand_WithPassword_ValidatesLengthDigitAndSpecialCharacter(string password, bool valid)
+        public async Task RegisterCommand_WithPassword_ValidatesLengthDigitAndSpecialCharacter(string password, bool valid)
         {
             var viewModel = CreateValidViewModel();
             viewModel.RegisterPassword = password;
             viewModel.ConfirmPassword = password;
 
-            AssertRegistrationResult(viewModel, valid);
+            await AssertRegistrationResult(viewModel, valid);
         }
 
         [Theory]
@@ -181,16 +182,16 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [InlineData("   ")]
         [InlineData("Different12!")]
         [InlineData("secret12!")]
-        public void RegisterCommand_WithMissingOrDifferentConfirmation_ShowsInvalidFormResource(string confirmation)
+        public async Task RegisterCommand_WithMissingOrDifferentConfirmation_ShowsInvalidFormResource(string confirmation)
         {
             var viewModel = CreateValidViewModel();
             viewModel.ConfirmPassword = confirmation;
 
-            AssertInvalidRegistration(viewModel);
+            await AssertInvalidRegistration(viewModel);
         }
 
         [Fact]
-        public void RegisterCommand_AfterCorrectingInvalidForm_ClearsErrorAndNotifiesFlag()
+        public async Task RegisterCommand_AfterCorrectingInvalidForm_ClearsErrorAndNotifiesFlag()
         {
             var viewModel = CreateValidViewModel();
             string validEmail = viewModel.Email;
@@ -198,9 +199,9 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
             var changedProperties = new List<string?>();
             viewModel.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
 
-            AssertInvalidRegistration(viewModel);
+            await AssertInvalidRegistration(viewModel);
             viewModel.Email = validEmail;
-            viewModel.RegisterCommand.Execute(null);
+            await viewModel.RegisterCommand.ExecuteAsync(null);
 
             viewModel.InvalidRegisterFormErrorMessage.Should().BeEmpty();
             viewModel.IsRegisterFormInvalid.Should().BeFalse();
@@ -210,7 +211,13 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
 
         private static RegisterFlowViewModel CreateValidViewModel()
         {
-            return new RegisterFlowViewModel(Array.Empty<ClaimableUserListItem>())
+            var response = AuthTestData.CreateResponse(AuthTestData.CreateTokens());
+            var session = new FakeAuthSession
+            {
+                RegisterHandler = (_, _) => Task.FromResult(new JassTournamentManager.App.Infrastructure.Auth.LoginResult(response, JassTournamentManager.App.Infrastructure.Auth.AuthFailure.None))
+            };
+
+            return new RegisterFlowViewModel(session, Array.Empty<ClaimableUserListItem>())
             {
                 FirstName = "Alex",
                 LastName = "River",
@@ -232,25 +239,25 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
             }
         }
 
-        private static void AssertRegistrationResult(RegisterFlowViewModel viewModel, bool valid)
+        private static async Task AssertRegistrationResult(RegisterFlowViewModel viewModel, bool valid)
         {
             if (!valid)
             {
-                AssertInvalidRegistration(viewModel);
+                await AssertInvalidRegistration(viewModel);
                 return;
             }
 
             viewModel.InvalidRegisterFormErrorMessage = AppResources.Register_ErrorMessage_RegisterFormInvalid;
 
-            viewModel.RegisterCommand.Execute(null);
+            await viewModel.RegisterCommand.ExecuteAsync(null);
 
             viewModel.InvalidRegisterFormErrorMessage.Should().BeEmpty();
             viewModel.IsRegisterFormInvalid.Should().BeFalse();
         }
 
-        private static void AssertInvalidRegistration(RegisterFlowViewModel viewModel)
+        private static async Task AssertInvalidRegistration(RegisterFlowViewModel viewModel)
         {
-            viewModel.RegisterCommand.Execute(null);
+            await viewModel.RegisterCommand.ExecuteAsync(null);
 
             viewModel.InvalidRegisterFormErrorMessage.Should().Be(AppResources.Register_ErrorMessage_RegisterFormInvalid);
             viewModel.IsRegisterFormInvalid.Should().BeTrue();

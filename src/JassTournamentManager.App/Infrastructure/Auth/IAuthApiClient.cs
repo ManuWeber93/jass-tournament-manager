@@ -6,6 +6,8 @@ namespace JassTournamentManager.App.Infrastructure.Auth
     {
         Task<LoginResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default);
 
+        Task<LoginResult> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default);
+
         Task<bool> LogoutAsync(StoredAuthTokens tokens, CancellationToken cancellationToken = default);
     }
 }

@@ -46,6 +46,10 @@ JassTournamentManager
 ├─ docs
 │  ├─ requirements.md
 │  ├─ architecture.md
+│  ├─ features
+│  │  └─ authentication.md
+│  ├─ testing
+│  │  └─ authentication.md
 │  └─ database-schema.md
 ├─ JassTournamentManager.Backend.slnx
 └─ JassTournamentManager.slnx
@@ -289,21 +293,9 @@ dotnet ef database update TargetMigrationName `
 
 Open the solution in Visual Studio, set `JassTournamentManager.App` as startup project and run it with the desired target platform.
 
-### Login and logout
+### Registration, login and logout
 
-The app supports login with an existing backend account. Successful login stores the issued tokens securely and opens a home screen showing the user's name. Login and logout use a dedicated HTTP client without automatic refresh; protected API requests continue to use the authenticating HTTP handler.
-
-Logout attempts to revoke the latest stored refresh token and then clears local authentication data. If the server cannot confirm logout (including an expired access token), the app still logs out locally and shows a warning. If secure-storage cleanup itself fails, the app reports the failure rather than pretending logout completed.
-
-Registration and user claiming are not connected yet. Sessions are not automatically restored when the app restarts. Local API addresses are configured in `ApiOptions`: `localhost:5272` on Windows and `10.0.2.2:5272` for the Android emulator. Device connectivity and platform HTTP/HTTPS settings must be configured for the target environment.
-
-Manual smoke test with the API running and an existing account:
-
-1. Submit empty credentials and verify that validation is shown.
-2. Submit incorrect credentials and verify that an authentication error is shown.
-3. Log in with valid credentials and verify the displayed user name and disabled inputs while loading.
-4. Log out and verify that the login screen returns without back navigation into the authenticated area.
-5. Log in again, stop the API, and log out: verify local logout and the remote-revocation warning.
+The app supports registration with automatic sign-in, login with an existing account, and logout. See the [authentication feature documentation](docs/features/authentication.md) for business rules and current limitations, the [architecture documentation](docs/architecture.md#app-authentication-and-session-handling) for technical details and local API configuration, and the [manual authentication tests](docs/testing/authentication.md) for smoke-test instructions.
 
 ### Running app unit tests
 
@@ -321,9 +313,11 @@ The app test project is included in the full solution, not the backend solution.
 
 Detailed documentation is maintained in:
 
-- `docs/requirements.md` — functional requirements and business rules
-- `docs/architecture.md` — technical architecture and deployment concepts
-- `docs/database-schema.md` — data model, entities and constraints
+- [Requirements](docs/requirements.md) — functional requirements and business rules
+- [Authentication](docs/features/authentication.md) — business rules, user flows and implementation status
+- [Architecture](docs/architecture.md) — technical architecture and deployment concepts
+- [Manual authentication tests](docs/testing/authentication.md) — prerequisites and smoke-test scenarios
+- [Database schema](docs/database-schema.md) — data model, entities and constraints
 
 ## Development Principles
 

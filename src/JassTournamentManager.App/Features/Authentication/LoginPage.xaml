@@ -55,7 +55,7 @@
 
                     <Button
                         Text="{x:Static resources:AppResources.Auth_SwitchToLogin}"
-                        IsEnabled="{Binding LoginForm.IsNotBusy}"
+                        IsEnabled="{Binding RegisterFlow.IsNotBusy}"
                         IsVisible="{Binding IsRegisterMode}"
                         Command="{Binding ShowLoginCommand}"
                         Style="{StaticResource SecondaryButton}" />

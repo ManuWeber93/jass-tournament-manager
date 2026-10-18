@@ -30,7 +30,7 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<AuthenticationViewModel>();
         builder.Services.AddSingleton<LoginFormViewModel>();
-        builder.Services.AddSingleton(_ => new RegisterFlowViewModel());
+        builder.Services.AddSingleton<RegisterFlowViewModel>();
 
         builder.Services.AddSingleton(new ApiOptions());
         builder.Services.AddSingleton<ISecureStorage>(SecureStorage.Default);

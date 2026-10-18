@@ -1,7 +1,9 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using JassTournamentManager.App.Features.Authentication.Models;
+using JassTournamentManager.App.Infrastructure.Auth;
 using JassTournamentManager.App.Resources.Localization;
+using JassTournamentManager.Contracts.Auth;
 using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 
@@ -9,6 +11,8 @@ namespace JassTournamentManager.App.Features.Authentication
 {
     public partial class RegisterFlowViewModel : ObservableObject
     {
+        private readonly IAuthSession session;
+
         private readonly List<ClaimableUserListItem> allClaimableUsers = new();
 
         private readonly Regex PasswordRegex = new(PasswordPattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(250));
@@ -53,15 +57,35 @@ namespace JassTournamentManager.App.Features.Authentication
         [NotifyPropertyChangedFor(nameof(IsRegisterFormInvalid))]
         public partial string InvalidRegisterFormErrorMessage { get; set; } = string.Empty;
 
-        public RegisterFlowViewModel() : this(CreateDummyClaimableUsers())
+        [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+        [NotifyCanExecuteChangedFor(nameof(RegisterCommand))]
+        [NotifyCanExecuteChangedFor(nameof(RegisterNavigateBackCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ShowClaimableUserSelectionCommand))]
+        [NotifyCanExecuteChangedFor(nameof(NoUserClaimingCommand))]
+        [NotifyCanExecuteChangedFor(nameof(ContinueWithSelectedClaimableUserCommand))]
+        public partial bool IsBusy { get; private set; }
+
+        public bool IsNotBusy => !IsBusy;
+
+        public RegisterFlowViewModel(IAuthSession session) : this(session, Array.Empty<ClaimableUserListItem>())
         {
         }
 
-        public RegisterFlowViewModel(IEnumerable<ClaimableUserListItem> claimableUsers)
+        public RegisterFlowViewModel(IAuthSession session, IEnumerable<ClaimableUserListItem> claimableUsers)
         {
+            this.session = session ?? throw new ArgumentNullException(nameof(session));
             ArgumentNullException.ThrowIfNull(claimableUsers);
             allClaimableUsers.AddRange(claimableUsers);
             ApplyClaimableUserFilter();
+            session.PropertyChanged += (_, args) =>
+            {
+                if (args.PropertyName == nameof(IAuthSession.CurrentUser) && session.CurrentUser is null)
+                {
+                    ClearPasswords();
+                    InvalidRegisterFormErrorMessage = string.Empty;
+                }
+            };
         }
 
         public bool IsPreviousParticipationQuestionVisible => CurrentRegisterStep == RegisterStep.PreviousParticipationQuestion;
@@ -90,25 +114,98 @@ namespace JassTournamentManager.App.Features.Authentication
             ValidateIfPasswordsMatch();
         }
 
-        [RelayCommand]
-        private void Register()
+        [RelayCommand(CanExecute = nameof(CanNavigate))]
+        private async Task RegisterAsync(CancellationToken cancellationToken)
         {
+            if (IsBusy)
+            {
+                return;
+            }
+
+            InvalidRegisterFormErrorMessage = string.Empty;
             if (!IsRegisterFormValid())
             {
                 InvalidRegisterFormErrorMessage = AppResources.Register_ErrorMessage_RegisterFormInvalid;
                 return;
             }
 
-            InvalidRegisterFormErrorMessage = string.Empty;
+            if (SelectedClaimableUser is not null)
+            {
+                InvalidRegisterFormErrorMessage = AppResources.Register_UserClaimingUnavailable;
+                return;
+            }
 
-            // Later: call register endpoint.
-
-            // Show error message if backend sends error back (e.g. duplicate email)
+            var request = new RegisterRequest(null, Email.Trim(), RegisterPassword, FirstName.Trim(), LastName.Trim());
+            await ExecuteRegistrationAsync(request, cancellationToken);
         }
 
-        [RelayCommand]
+        private async Task ExecuteRegistrationAsync(RegisterRequest request, CancellationToken cancellationToken)
+        {
+            try
+            {
+                IsBusy = true;
+                LoginResult result = await session.RegisterAsync(request, cancellationToken);
+                HandleRegistrationResult(result);
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                // A canceled request does not confirm whether the account was created.
+            }
+            catch (AuthStorageException)
+            {
+                ClearPasswords();
+                InvalidRegisterFormErrorMessage = AppResources.Register_StorageError;
+            }
+            catch (Exception)
+            {
+                InvalidRegisterFormErrorMessage = AppResources.Auth_UnexpectedError;
+            }
+            finally
+            {
+                IsBusy = false;
+            }
+        }
+
+        private void HandleRegistrationResult(LoginResult result)
+        {
+            if (result.Session is not null)
+            {
+                ClearPasswords();
+                return;
+            }
+
+            SetErrorMessageBasedOnResult(result);
+        }
+
+        private void SetErrorMessageBasedOnResult(LoginResult result)
+        {
+            InvalidRegisterFormErrorMessage = result.Failure switch
+            {
+                AuthFailure.InvalidInput => AppResources.Register_ErrorMessage_RegisterFormInvalid,
+                AuthFailure.EmailAlreadyInUse => AppResources.Register_EmailAlreadyInUse,
+                AuthFailure.UserClaimingDisabled => AppResources.Register_UserClaimingUnavailable,
+                AuthFailure.Network => AppResources.Register_NetworkError,
+                AuthFailure.InvalidResponse => AppResources.Register_InvalidResponse,
+                _ => AppResources.Auth_ServerError
+            };
+        }
+
+        private void ClearPasswords()
+        {
+            RegisterPassword = string.Empty;
+            ConfirmPassword = string.Empty;
+        }
+
+        private bool CanNavigate() => !IsBusy;
+
+        [RelayCommand(CanExecute = nameof(CanNavigate))]
         private void RegisterNavigateBack()
         {
+            if (IsBusy)
+            {
+                return;
+            }
+
             if (CurrentRegisterStep == RegisterStep.ClaimableUserSelection)
             {
                 CurrentRegisterStep = RegisterStep.PreviousParticipationQuestion;
@@ -127,15 +224,25 @@ namespace JassTournamentManager.App.Features.Authentication
             }
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanNavigate))]
         private void ShowClaimableUserSelection()
         {
+            if (IsBusy)
+            {
+                return;
+            }
+
             CurrentRegisterStep = RegisterStep.ClaimableUserSelection;
         }
 
-        [RelayCommand]
+        [RelayCommand(CanExecute = nameof(CanNavigate))]
         private void NoUserClaiming()
         {
+            if (IsBusy)
+            {
+                return;
+            }
+
             SelectedClaimableUser = null;
             CurrentRegisterStep = RegisterStep.RegistrationForm;
         }
@@ -143,23 +250,13 @@ namespace JassTournamentManager.App.Features.Authentication
         [RelayCommand(CanExecute = nameof(CanContinueWithSelectedClaimableUser))]
         private void ContinueWithSelectedClaimableUser()
         {
-            if (SelectedClaimableUser is null)
+            if (!CanContinueWithSelectedClaimableUser())
             {
                 return;
             }
 
-            PrefillRegistrationForm(SelectedClaimableUser);
+            PrefillRegistrationForm(SelectedClaimableUser!);
             CurrentRegisterStep = RegisterStep.RegistrationForm;
-        }
-
-        private static IEnumerable<ClaimableUserListItem> CreateDummyClaimableUsers()
-        {
-            return
-            [
-                new(Guid.NewGuid(), "Max", "Muster"),
-                new(Guid.NewGuid(), "Maja", "Meisterhans"),
-                new(Guid.NewGuid(), "Seraina", "Huber")
-            ];
         }
 
         private void ValidateIfPasswordsMatch()
@@ -200,7 +297,7 @@ namespace JassTournamentManager.App.Features.Authentication
 
         private bool CanContinueWithSelectedClaimableUser()
         {
-            return SelectedClaimableUser is not null;
+            return !IsBusy && SelectedClaimableUser is not null;
         }
 
         private void PrefillRegistrationForm(ClaimableUserListItem selectedClaimableUser)
@@ -211,22 +308,22 @@ namespace JassTournamentManager.App.Features.Authentication
 
         private bool IsRegisterFormValid()
         {
-            if (string.IsNullOrWhiteSpace(FirstName) || FirstName.Length > 50)
+            if (string.IsNullOrWhiteSpace(FirstName) || FirstName.Trim().Length > 50)
             {
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(LastName) || LastName.Length > 50)
+            if (string.IsNullOrWhiteSpace(LastName) || LastName.Trim().Length > 50)
             {
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(Email) || Email.Length > 320 || !IsValidEmailAddress(Email))
+            if (string.IsNullOrWhiteSpace(Email) || Email.Trim().Length > 320 || !IsValidEmailAddress(Email.Trim()))
             {
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(RegisterPassword) || !PasswordRegex.IsMatch(RegisterPassword))
+            if (string.IsNullOrWhiteSpace(RegisterPassword) || RegisterPassword.Length > 200 || !PasswordRegex.IsMatch(RegisterPassword))
             {
                 return false;
             }

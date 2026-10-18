@@ -68,6 +68,30 @@ namespace JassTournamentManager.App.Resources.Localization {
                 return ResourceManager.GetString("App_Title", resourceCulture);
             }
         }
+
+        public static string Register_EmailAlreadyInUse {
+            get { return ResourceManager.GetString("Register_EmailAlreadyInUse", resourceCulture); }
+        }
+
+        public static string Register_UserClaimingUnavailable {
+            get { return ResourceManager.GetString("Register_UserClaimingUnavailable", resourceCulture); }
+        }
+
+        public static string Register_StorageError {
+            get { return ResourceManager.GetString("Register_StorageError", resourceCulture); }
+        }
+
+        public static string Register_InvalidResponse {
+            get { return ResourceManager.GetString("Register_InvalidResponse", resourceCulture); }
+        }
+
+        public static string Register_NetworkError {
+            get { return ResourceManager.GetString("Register_NetworkError", resourceCulture); }
+        }
+
+        public static string Register_PasswordMaxLength {
+            get { return ResourceManager.GetString("Register_PasswordMaxLength", resourceCulture); }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Die E-Mail-Adresse oder das Passwort ist falsch..

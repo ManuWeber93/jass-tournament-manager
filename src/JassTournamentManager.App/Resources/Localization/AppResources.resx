@@ -258,4 +258,22 @@
   <data name="Home_Logout" xml:space="preserve">
     <value>Abmelden</value>
   </data>
+  <data name="Register_EmailAlreadyInUse" xml:space="preserve">
+    <value>Diese E-Mail-Adresse wird bereits verwendet. Bitte melde dich an oder verwende eine andere E-Mail-Adresse.</value>
+  </data>
+  <data name="Register_UserClaimingUnavailable" xml:space="preserve">
+    <value>Die Übernahme bestehender Teilnehmer ist in der App noch nicht verfügbar.</value>
+  </data>
+  <data name="Register_StorageError" xml:space="preserve">
+    <value>Dein Konto wurde erstellt, aber die Anmeldung konnte auf diesem Gerät nicht gespeichert werden. Bitte melde dich an.</value>
+  </data>
+  <data name="Register_InvalidResponse" xml:space="preserve">
+    <value>Die Serverantwort konnte nicht verarbeitet werden. Dein Konto wurde möglicherweise bereits erstellt. Bitte versuche, dich anzumelden.</value>
+  </data>
+  <data name="Register_NetworkError" xml:space="preserve">
+    <value>Die Registrierung konnte wegen eines Verbindungsproblems nicht bestätigt werden. Dein Konto wurde möglicherweise bereits erstellt. Bitte versuche, dich anzumelden.</value>
+  </data>
+  <data name="Register_PasswordMaxLength" xml:space="preserve">
+    <value>Das Passwort darf höchstens 200 Zeichen enthalten.</value>
+  </data>
 </root>

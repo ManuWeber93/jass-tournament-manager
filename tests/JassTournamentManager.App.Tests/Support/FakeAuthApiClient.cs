@@ -6,9 +6,12 @@ namespace JassTournamentManager.App.Tests.Support;
 internal sealed class FakeAuthApiClient : IAuthApiClient
 {
     public List<(LoginRequest Request, CancellationToken Token)> LoginCalls { get; } = new();
+    public List<(RegisterRequest Request, CancellationToken Token)> RegisterCalls { get; } = new();
     public List<(StoredAuthTokens Tokens, CancellationToken Token)> LogoutCalls { get; } = new();
     public Func<LoginRequest, CancellationToken, Task<LoginResult>> LoginHandler { get; set; } =
         (_, _) => Task.FromResult(new LoginResult(null, AuthFailure.InvalidCredentials));
+    public Func<RegisterRequest, CancellationToken, Task<LoginResult>> RegisterHandler { get; set; } =
+        (_, _) => Task.FromResult(new LoginResult(null, AuthFailure.InvalidInput));
     public Func<StoredAuthTokens, CancellationToken, Task<bool>> LogoutHandler { get; set; } =
         (_, _) => Task.FromResult(true);
 
@@ -16,6 +19,12 @@ internal sealed class FakeAuthApiClient : IAuthApiClient
     {
         LoginCalls.Add((request, cancellationToken));
         return LoginHandler(request, cancellationToken);
+    }
+
+    public Task<LoginResult> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+    {
+        RegisterCalls.Add((request, cancellationToken));
+        return RegisterHandler(request, cancellationToken);
     }
 
     public Task<bool> LogoutAsync(StoredAuthTokens tokens, CancellationToken cancellationToken = default)

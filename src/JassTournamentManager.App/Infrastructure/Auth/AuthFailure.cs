@@ -6,6 +6,9 @@ namespace JassTournamentManager.App.Infrastructure.Auth
         InvalidCredentials,
         Network,
         Server,
-        InvalidResponse
+        InvalidResponse,
+        InvalidInput,
+        EmailAlreadyInUse,
+        UserClaimingDisabled
     }
 }

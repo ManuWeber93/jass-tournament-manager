@@ -24,6 +24,17 @@ namespace JassTournamentManager.App.Infrastructure.Auth
         public async Task<LoginResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
         {
             LoginResult result = await apiClient.LoginAsync(request, cancellationToken);
+            return await PersistSessionAsync(result, cancellationToken);
+        }
+
+        public async Task<LoginResult> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+        {
+            LoginResult result = await apiClient.RegisterAsync(request, cancellationToken);
+            return await PersistSessionAsync(result, cancellationToken);
+        }
+
+        private async Task<LoginResult> PersistSessionAsync(LoginResult result, CancellationToken cancellationToken)
+        {
             if (result.Session is null)
             {
                 return result;

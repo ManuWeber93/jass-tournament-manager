@@ -11,44 +11,51 @@
 
     <VerticalStackLayout Spacing="12">
 
-        <material:TextField Title="{x:Static resources:AppResources.Register_FirstName}" Text="{Binding FirstName}">
-            <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_FirstNameRequired}" />
-            <validation:MaxLengthValidation MaxLength="50" Message="{x:Static resources:AppResources.Register_ErrorMessage_FirstNameMaxLength}" />
-        </material:TextField>
+        <VerticalStackLayout Spacing="12" IsEnabled="{Binding IsNotBusy}">
 
-        <material:TextField Title="{x:Static resources:AppResources.Register_LastName}" Text="{Binding LastName}">
-            <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_LastNameRequired}" />
-            <validation:MaxLengthValidation MaxLength="50" Message="{x:Static resources:AppResources.Register_ErrorMessage_LastNameMaxLength}" />
-        </material:TextField>
+            <material:TextField Title="{x:Static resources:AppResources.Register_FirstName}" Text="{Binding FirstName}">
+                <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_FirstNameRequired}" />
+                <validation:MaxLengthValidation MaxLength="50" Message="{x:Static resources:AppResources.Register_ErrorMessage_FirstNameMaxLength}" />
+            </material:TextField>
 
-        <material:TextField Title="{x:Static resources:AppResources.Register_Email}" Text="{Binding Email}" Keyboard="Email">
-            <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailRequired}" />
-            <validation:MaxLengthValidation MaxLength="320" Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailMaxLength}" />
-            <validation:RegexValidation Pattern="{x:Static input:AdvancedEntry.REGEX_EMAIL}" Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailNotValid}"/>
-        </material:TextField>
+            <material:TextField Title="{x:Static resources:AppResources.Register_LastName}" Text="{Binding LastName}">
+                <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_LastNameRequired}" />
+                <validation:MaxLengthValidation MaxLength="50" Message="{x:Static resources:AppResources.Register_ErrorMessage_LastNameMaxLength}" />
+            </material:TextField>
 
-        <material:TextField Title="{x:Static resources:AppResources.Register_Password}" Text="{Binding RegisterPassword}" IsPassword="True">
-            <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordRequired}" />
-            <validation:RegexValidation Pattern="{x:Static auth:RegisterFlowViewModel.PasswordPattern}" Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordMinRequirements}" />
-        </material:TextField>
+            <material:TextField Title="{x:Static resources:AppResources.Register_Email}" Text="{Binding Email}" Keyboard="Email">
+                <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailRequired}" />
+                <validation:MaxLengthValidation MaxLength="320" Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailMaxLength}" />
+                <validation:RegexValidation Pattern="{x:Static input:AdvancedEntry.REGEX_EMAIL}" Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailNotValid}"/>
+            </material:TextField>
 
-        <material:TextField Title="{x:Static resources:AppResources.Register_ConfirmPassword}" Text="{Binding ConfirmPassword}" IsPassword="True">
-            <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_ConfirmPasswordRequired}" />
-        </material:TextField>
-        <Label IsVisible="{Binding IsRegisterPasswordMismatch}" Text="{Binding RegisterPasswordMismatchErrorMessage}" TextColor="{StaticResource AppDanger}" />
+            <material:TextField Title="{x:Static resources:AppResources.Register_Password}" Text="{Binding RegisterPassword}" IsPassword="True">
+                <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordRequired}" />
+                <validation:MaxLengthValidation MaxLength="200" Message="{x:Static resources:AppResources.Register_PasswordMaxLength}" />
+                <validation:RegexValidation Pattern="{x:Static auth:RegisterFlowViewModel.PasswordPattern}" Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordMinRequirements}" />
+            </material:TextField>
 
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
-            <Button
-                Grid.Column="0"
-                Text="{x:Static resources:AppResources.Register_BackButton}"
-                Command="{Binding RegisterNavigateBackCommand}"
-                Style="{StaticResource SecondaryButton}" />
+            <material:TextField Title="{x:Static resources:AppResources.Register_ConfirmPassword}" Text="{Binding ConfirmPassword}" IsPassword="True">
+                <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_ConfirmPasswordRequired}" />
+            </material:TextField>
+            <Label IsVisible="{Binding IsRegisterPasswordMismatch}" Text="{Binding RegisterPasswordMismatchErrorMessage}" TextColor="{StaticResource AppDanger}" />
 
-            <Button
-                Grid.Column="1"
-                Text="{x:Static resources:AppResources.Register_CreateAccount}"
-                Command="{Binding RegisterCommand}" />
-        </Grid>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                <Button
+                    Grid.Column="0"
+                    Text="{x:Static resources:AppResources.Register_BackButton}"
+                    Command="{Binding RegisterNavigateBackCommand}"
+                    Style="{StaticResource SecondaryButton}" />
+
+                <Button
+                    Grid.Column="1"
+                    Text="{x:Static resources:AppResources.Register_CreateAccount}"
+                    Command="{Binding RegisterCommand}" />
+            </Grid>
+
+        </VerticalStackLayout>
+
+        <ActivityIndicator IsRunning="{Binding IsBusy}" IsVisible="{Binding IsBusy}" />
 
         <Label IsVisible="{Binding IsRegisterFormInvalid}" Text="{Binding InvalidRegisterFormErrorMessage}" TextColor="{StaticResource AppDanger}" />
 

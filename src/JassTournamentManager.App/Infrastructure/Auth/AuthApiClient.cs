@@ -18,13 +18,24 @@ namespace JassTournamentManager.App.Infrastructure.Auth
             this.httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
         }
 
-        public async Task<LoginResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
+        public Task<LoginResult> LoginAsync(LoginRequest request, CancellationToken cancellationToken = default)
         {
             ArgumentNullException.ThrowIfNull(request);
+            return AuthenticateAsync("api/auth/login", request, MapLoginFailure, cancellationToken);
+        }
 
+        public Task<LoginResult> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+            return AuthenticateAsync("api/auth/register", request, MapRegistrationFailure, cancellationToken);
+        }
+
+        private async Task<LoginResult> AuthenticateAsync<TRequest>(string endpoint, TRequest request,
+            Func<HttpStatusCode, AuthFailure> mapFailure, CancellationToken cancellationToken)
+        {
             try
             {
-                return await ExecuteLoginAsync(request, cancellationToken);
+                return await ExecuteAuthenticationAsync(endpoint, request, mapFailure, cancellationToken);
             }
             catch (JsonException)
             {
@@ -41,16 +52,13 @@ namespace JassTournamentManager.App.Infrastructure.Auth
             }
         }
 
-        private async Task<LoginResult> ExecuteLoginAsync(LoginRequest request, CancellationToken cancellationToken)
+        private async Task<LoginResult> ExecuteAuthenticationAsync<TRequest>(string endpoint, TRequest request,
+            Func<HttpStatusCode, AuthFailure> mapFailure, CancellationToken cancellationToken)
         {
-            using HttpResponseMessage response = await httpClient.PostAsJsonAsync("api/auth/login", request, cancellationToken);
+            using HttpResponseMessage response = await httpClient.PostAsJsonAsync(endpoint, request, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
-                AuthFailure failure = response.StatusCode is HttpStatusCode.BadRequest or HttpStatusCode.Unauthorized
-                    ? AuthFailure.InvalidCredentials
-                    : AuthFailure.Server;
-
-                return new LoginResult(null, failure);
+                return new LoginResult(null, mapFailure(response.StatusCode));
             }
 
             AuthResponse? session = await response.Content.ReadFromJsonAsync<AuthResponse>(cancellationToken);
@@ -59,6 +67,19 @@ namespace JassTournamentManager.App.Infrastructure.Auth
                 ? LoginResult.Success(session!)
                 : new LoginResult(null, AuthFailure.InvalidResponse);
         }
+
+        private static AuthFailure MapLoginFailure(HttpStatusCode status) =>
+            status is HttpStatusCode.BadRequest or HttpStatusCode.Unauthorized
+                ? AuthFailure.InvalidCredentials
+                : AuthFailure.Server;
+
+        private static AuthFailure MapRegistrationFailure(HttpStatusCode status) => status switch
+        {
+            HttpStatusCode.BadRequest => AuthFailure.InvalidInput,
+            HttpStatusCode.Conflict => AuthFailure.EmailAlreadyInUse,
+            HttpStatusCode.Forbidden => AuthFailure.UserClaimingDisabled,
+            _ => AuthFailure.Server
+        };
 
         public async Task<bool> LogoutAsync(StoredAuthTokens tokens, CancellationToken cancellationToken = default)
         {

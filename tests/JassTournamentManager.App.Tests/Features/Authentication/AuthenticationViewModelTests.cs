@@ -12,7 +12,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void Constructor_WithProvidedForms_StoresSameInstances()
         {
             var loginForm = new LoginFormViewModel(new FakeAuthSession());
-            var registerFlow = new RegisterFlowViewModel(Array.Empty<ClaimableUserListItem>());
+            var registerFlow = new RegisterFlowViewModel(new FakeAuthSession(), Array.Empty<ClaimableUserListItem>());
 
             var viewModel = new AuthenticationViewModel(loginForm, registerFlow);
 
@@ -84,7 +84,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
             var completion = new TaskCompletionSource<JassTournamentManager.App.Infrastructure.Auth.LoginResult>(TaskCreationOptions.RunContinuationsAsynchronously);
             var session = new FakeAuthSession { LoginHandler = (_, _) => completion.Task };
             var login = new LoginFormViewModel(session) { Email = "player@example.test", Password = "Secret123!" };
-            var registration = new RegisterFlowViewModel(Array.Empty<ClaimableUserListItem>())
+            var registration = new RegisterFlowViewModel(new FakeAuthSession(), Array.Empty<ClaimableUserListItem>())
             {
                 CurrentRegisterStep = RegisterStep.RegistrationForm
             };
@@ -100,9 +100,63 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
             await execution;
         }
 
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public async Task ModeCommands_WhileRegistrationRunning_PreserveModeAndRegistrationStep(bool registerMode)
+        {
+            var completion = new TaskCompletionSource<JassTournamentManager.App.Infrastructure.Auth.LoginResult>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var session = new FakeAuthSession { RegisterHandler = (_, _) => completion.Task };
+            var registration = new RegisterFlowViewModel(session)
+            {
+                FirstName = "Alex", LastName = "River", Email = "player@example.test",
+                RegisterPassword = "Secret123!", ConfirmPassword = "Secret123!",
+                CurrentRegisterStep = RegisterStep.RegistrationForm
+            };
+            var viewModel = new AuthenticationViewModel(new LoginFormViewModel(session), registration)
+            {
+                IsRegisterMode = registerMode
+            };
+            Task execution = registration.RegisterCommand.ExecuteAsync(null);
+
+            viewModel.ShowLoginCommand.Execute(null);
+            viewModel.ShowRegisterCommand.Execute(null);
+
+            viewModel.IsRegisterMode.Should().Be(registerMode);
+            registration.CurrentRegisterStep.Should().Be(RegisterStep.RegistrationForm);
+            completion.SetResult(new(null, JassTournamentManager.App.Infrastructure.Auth.AuthFailure.Network));
+            await execution;
+        }
+
+        [Fact]
+        public async Task RegisterCommand_SessionUserChanged_DoesNotSwitchAuthenticationMode()
+        {
+            var response = AuthTestData.CreateResponse(AuthTestData.CreateTokens());
+            var session = new FakeAuthSession();
+            session.RegisterHandler = (_, _) =>
+            {
+                session.SetUser(response.User);
+                return Task.FromResult(new JassTournamentManager.App.Infrastructure.Auth.LoginResult(response, JassTournamentManager.App.Infrastructure.Auth.AuthFailure.None));
+            };
+            var registration = new RegisterFlowViewModel(session)
+            {
+                FirstName = "Alex", LastName = "River", Email = "player@example.test",
+                RegisterPassword = "Secret123!", ConfirmPassword = "Secret123!"
+            };
+            var viewModel = new AuthenticationViewModel(new LoginFormViewModel(session), registration)
+            {
+                IsRegisterMode = true
+            };
+
+            await registration.RegisterCommand.ExecuteAsync(null);
+
+            session.CurrentUser.Should().BeSameAs(response.User);
+            viewModel.IsRegisterMode.Should().BeTrue();
+        }
+
         private static AuthenticationViewModel CreateViewModel()
         {
-            return new(new LoginFormViewModel(new FakeAuthSession()), new RegisterFlowViewModel(Array.Empty<ClaimableUserListItem>()));
+            return new(new LoginFormViewModel(new FakeAuthSession()), new RegisterFlowViewModel(new FakeAuthSession(), Array.Empty<ClaimableUserListItem>()));
         }
     }
 }

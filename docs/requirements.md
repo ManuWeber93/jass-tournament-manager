@@ -28,7 +28,7 @@ Web application for Jass tournament organizers to manage Schieber tournaments.
 - See all tournaments they participated in
 - Can view leaderboards for an organizer's tournaments
 - Can join tournaments via code
-- Can select an existing user during first login/registration, so that they can reuse a user that was created during an import
+- Planned: can select an existing user during first login/registration, so that they can reuse a user that was created during an import; this flow is not yet available in the app
 
 ## Jass Variant: Schieber
 
@@ -83,10 +83,9 @@ Tournament
 ## Features
 
 ### Authentication & Sessions
-- Users receive an access token and refresh token after successful login, registration, or claiming an imported user.
-- Refresh tokens allow clients to renew a session without asking the user to log in again.
-- Refresh tokens are rotated on session refresh, so the previous refresh token becomes invalid.
-- Users can log out, which revokes the submitted active refresh token.
+- Users can register with automatic sign-in, log in with an existing account, and log out.
+- Detailed business rules, error cases and implemented versus deferred app behavior are maintained in [Authentication](features/authentication.md).
+- Token handling, refresh and revocation are described in the [architecture documentation](architecture.md#app-authentication-and-session-handling).
 
 ### Pairing Management
 - Organizers can assign pairings manually

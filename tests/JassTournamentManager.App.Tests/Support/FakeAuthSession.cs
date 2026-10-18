@@ -11,9 +11,12 @@ internal sealed class FakeAuthSession : IAuthSession
     public UserResponse? CurrentUser { get; private set; }
     public bool LogoutWarning { get; private set; }
     public List<(LoginRequest Request, CancellationToken Token)> LoginCalls { get; } = new();
+    public List<(RegisterRequest Request, CancellationToken Token)> RegisterCalls { get; } = new();
     public List<CancellationToken> LogoutCalls { get; } = new();
     public Func<LoginRequest, CancellationToken, Task<LoginResult>> LoginHandler { get; set; } =
         (_, _) => Task.FromResult(new LoginResult(null, AuthFailure.InvalidCredentials));
+    public Func<RegisterRequest, CancellationToken, Task<LoginResult>> RegisterHandler { get; set; } =
+        (_, _) => Task.FromResult(new LoginResult(null, AuthFailure.InvalidInput));
     public Func<CancellationToken, Task> LogoutHandler { get; set; } = _ => Task.CompletedTask;
 
     public void SetUser(UserResponse? user, bool logoutWarning = false)
@@ -27,6 +30,12 @@ internal sealed class FakeAuthSession : IAuthSession
     {
         LoginCalls.Add((request, cancellationToken));
         return LoginHandler(request, cancellationToken);
+    }
+
+    public Task<LoginResult> RegisterAsync(RegisterRequest request, CancellationToken cancellationToken = default)
+    {
+        RegisterCalls.Add((request, cancellationToken));
+        return RegisterHandler(request, cancellationToken);
     }
 
     public Task LogoutAsync(CancellationToken cancellationToken = default)
