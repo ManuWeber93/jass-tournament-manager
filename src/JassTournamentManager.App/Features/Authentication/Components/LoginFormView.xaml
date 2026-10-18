@@ -21,6 +21,9 @@
         </material:TextField>
 
         <material:TextField Title="{x:Static resources:AppResources.Login_Password}" Text="{Binding Password}" IsPassword="True" IsEnabled="{Binding IsNotBusy}">
+            <material:TextField.Attachments>
+                <material:TextFieldPasswordShowHideAttachment SemanticProperties.Description="{x:Static resources:AppResources.Auth_TogglePasswordVisibility}" />
+            </material:TextField.Attachments>
             <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordRequired}" />
         </material:TextField>
 

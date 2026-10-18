@@ -276,4 +276,7 @@
   <data name="Register_PasswordMaxLength" xml:space="preserve">
     <value>Das Passwort darf höchstens 200 Zeichen enthalten.</value>
   </data>
+  <data name="Auth_TogglePasswordVisibility" xml:space="preserve">
+    <value>Passwort anzeigen oder verbergen</value>
+  </data>
 </root>

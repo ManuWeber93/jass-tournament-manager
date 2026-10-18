@@ -25,6 +25,13 @@ These smoke tests verify user-visible authentication behavior. Business rules ar
 4. Log out and attempt registration with the same email address: verify the duplicate-email message and that the app stays unauthenticated.
 5. Stop the API and attempt registration with a different address: verify the connection message and restored controls. If the response was lost after submission, try login before registering again.
 
+## Password Visibility
+
+1. Open login and verify that the password is masked initially. Enter a password, reveal it using the field's show/hide action, and verify that the text is unchanged. Toggle again and verify that it is masked.
+2. Open registration and repeat the check independently for password and confirmation. Toggling one field must not reveal the other or affect validation.
+3. While login or registration is running, verify that the show/hide actions are disabled together with their input fields.
+4. On the target device, verify that the actions are discoverable and announced with a meaningful description by the screen reader.
+
 ## Coverage Limits
 
 These manual scenarios do not deterministically reproduce secure-storage failures or a response lost after successful account creation. Those cases require controlled fault injection; platform-neutral automated tests use fake HTTP and secure-storage implementations. See [Running app unit tests](../../README.md#running-app-unit-tests) for the command and the limits of that test suite.

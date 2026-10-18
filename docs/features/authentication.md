@@ -48,6 +48,12 @@ The 200-character password maximum mirrors the existing registration contract. T
 - Inputs are disabled while login is running.
 - Successful login opens the home screen showing the user's name after session storage succeeds.
 
+## Password Visibility
+
+- Login, registration and password confirmation fields are masked by default.
+- Each password field has its own show/hide action, allowing users to reveal the entered text and mask it again without changing its value.
+- Visibility controls are disabled together with the form inputs while a request is running.
+
 ## Logout
 
 - Logout attempts to end the server session and clears local authentication data.

@@ -30,12 +30,18 @@
             </material:TextField>
 
             <material:TextField Title="{x:Static resources:AppResources.Register_Password}" Text="{Binding RegisterPassword}" IsPassword="True">
+                <material:TextField.Attachments>
+                    <material:TextFieldPasswordShowHideAttachment SemanticProperties.Description="{x:Static resources:AppResources.Auth_TogglePasswordVisibility}" />
+                </material:TextField.Attachments>
                 <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordRequired}" />
                 <validation:MaxLengthValidation MaxLength="200" Message="{x:Static resources:AppResources.Register_PasswordMaxLength}" />
                 <validation:RegexValidation Pattern="{x:Static auth:RegisterFlowViewModel.PasswordPattern}" Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordMinRequirements}" />
             </material:TextField>
 
             <material:TextField Title="{x:Static resources:AppResources.Register_ConfirmPassword}" Text="{Binding ConfirmPassword}" IsPassword="True">
+                <material:TextField.Attachments>
+                    <material:TextFieldPasswordShowHideAttachment SemanticProperties.Description="{x:Static resources:AppResources.Auth_TogglePasswordVisibility}" />
+                </material:TextField.Attachments>
                 <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_ConfirmPasswordRequired}" />
             </material:TextField>
             <Label IsVisible="{Binding IsRegisterPasswordMismatch}" Text="{Binding RegisterPasswordMismatchErrorMessage}" TextColor="{StaticResource AppDanger}" />

@@ -506,5 +506,14 @@ namespace JassTournamentManager.App.Resources.Localization {
                 return ResourceManager.GetString("Register_Title", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Gets the localized description for toggling password visibility.
+        /// </summary>
+        public static string Auth_TogglePasswordVisibility {
+            get {
+                return ResourceManager.GetString("Auth_TogglePasswordVisibility", resourceCulture);
+            }
+        }
     }
 }
