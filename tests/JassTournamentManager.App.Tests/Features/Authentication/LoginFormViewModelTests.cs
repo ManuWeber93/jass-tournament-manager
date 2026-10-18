@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using JassTournamentManager.App.Features.Authentication;
+using JassTournamentManager.App.Tests.Support;
 using Xunit;
 
 namespace JassTournamentManager.App.Tests.Features.Authentication
@@ -9,7 +10,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [Fact]
         public void Constructor_ByDefault_InitializesEmptyCredentials()
         {
-            var viewModel = new LoginFormViewModel();
+            var viewModel = new LoginFormViewModel(new FakeAuthSession());
 
             viewModel.Email.Should().BeEmpty();
             viewModel.Password.Should().BeEmpty();
@@ -20,7 +21,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [InlineData(nameof(LoginFormViewModel.Password), "Secret123!")]
         public void Credential_WhenChanged_StoresValueAndNotifiesOnlyOnce(string propertyName, string value)
         {
-            var viewModel = new LoginFormViewModel();
+            var viewModel = new LoginFormViewModel(new FakeAuthSession());
             var changedProperties = new List<string?>();
             viewModel.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
 

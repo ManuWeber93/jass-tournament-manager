@@ -15,17 +15,28 @@
         FontSize="22"
         FontAttributes="Bold" />
 
-        <material:TextField Title="{x:Static resources:AppResources.Login_Email}" Text="{Binding Email}" Keyboard="Email">
+        <material:TextField Title="{x:Static resources:AppResources.Login_Email}" Text="{Binding Email}" Keyboard="Email" IsEnabled="{Binding IsNotBusy}">
             <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailRequired}" />
             <validation:RegexValidation Pattern="{x:Static input:AdvancedEntry.REGEX_EMAIL}" />
         </material:TextField>
 
-        <material:TextField Title="{x:Static resources:AppResources.Login_Password}" Text="{Binding Password}" IsPassword="True">
+        <material:TextField Title="{x:Static resources:AppResources.Login_Password}" Text="{Binding Password}" IsPassword="True" IsEnabled="{Binding IsNotBusy}">
             <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordRequired}" />
         </material:TextField>
 
+        <Label
+            Text="{Binding ErrorMessage}"
+            IsVisible="{Binding HasError}"
+            TextColor="{StaticResource AppDanger}" />
+
+        <ActivityIndicator
+            IsRunning="{Binding IsBusy}"
+            IsVisible="{Binding IsBusy}"
+            HorizontalOptions="Center" />
+
         <Button
             Text="{x:Static resources:AppResources.Login_Login}"
+            IsEnabled="{Binding IsNotBusy}"
             Command="{Binding LoginCommand}" />
     </VerticalStackLayout>
 

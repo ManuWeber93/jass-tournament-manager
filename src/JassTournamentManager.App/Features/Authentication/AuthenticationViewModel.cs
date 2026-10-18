@@ -25,12 +25,20 @@ namespace JassTournamentManager.App.Features.Authentication
         [RelayCommand]
         private void ShowLogin()
         {
+            if (LoginForm.IsBusy)
+            {
+                return;
+            }
             IsRegisterMode = false;
         }
 
         [RelayCommand]
         private void ShowRegister()
         {
+            if (LoginForm.IsBusy)
+            {
+                return;
+            }
             IsRegisterMode = true;
             RegisterFlow.CurrentRegisterStep = RegisterStep.PreviousParticipationQuestion;
         }

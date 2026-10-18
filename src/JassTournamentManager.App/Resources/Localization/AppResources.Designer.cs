@@ -70,6 +70,69 @@ namespace JassTournamentManager.App.Resources.Localization {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Die E-Mail-Adresse oder das Passwort ist falsch..
+        /// </summary>
+        public static string Auth_InvalidCredentials {
+            get {
+                return ResourceManager.GetString("Auth_InvalidCredentials", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Bitte prüfe deine Eingaben..
+        /// </summary>
+        public static string Auth_InvalidInput {
+            get {
+                return ResourceManager.GetString("Auth_InvalidInput", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Die Antwort des Servers konnte nicht verarbeitet werden. Bitte versuche es erneut..
+        /// </summary>
+        public static string Auth_InvalidResponse {
+            get {
+                return ResourceManager.GetString("Auth_InvalidResponse", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Du wurdest auf diesem Gerät abgemeldet. Die Sitzung auf dem Server konnte jedoch nicht widerrufen werden..
+        /// </summary>
+        public static string Auth_LogoutRemoteFailed {
+            get {
+                return ResourceManager.GetString("Auth_LogoutRemoteFailed", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Die Verbindung zum Server ist fehlgeschlagen. Bitte prüfe deine Internetverbindung und versuche es erneut..
+        /// </summary>
+        public static string Auth_NetworkError {
+            get {
+                return ResourceManager.GetString("Auth_NetworkError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Der Server ist derzeit nicht verfügbar. Bitte versuche es später erneut..
+        /// </summary>
+        public static string Auth_ServerError {
+            get {
+                return ResourceManager.GetString("Auth_ServerError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Die Anmeldedaten konnten auf diesem Gerät nicht gespeichert oder entfernt werden. Bitte versuche es erneut..
+        /// </summary>
+        public static string Auth_StorageError {
+            get {
+                return ResourceManager.GetString("Auth_StorageError", resourceCulture);
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Melde dich an oder erstelle dein Konto..
         /// </summary>
         public static string Auth_Subtitle {
@@ -96,6 +159,42 @@ namespace JassTournamentManager.App.Resources.Localization {
             }
         }
         
+        /// <summary>
+        ///   Looks up a localized string similar to Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut..
+        /// </summary>
+        public static string Auth_UnexpectedError {
+            get {
+                return ResourceManager.GetString("Auth_UnexpectedError", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Abmelden.
+        /// </summary>
+        public static string Home_Logout {
+            get {
+                return ResourceManager.GetString("Home_Logout", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Startseite.
+        /// </summary>
+        public static string Home_Title {
+            get {
+                return ResourceManager.GetString("Home_Title", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Willkommen!.
+        /// </summary>
+        public static string Home_Welcome {
+            get {
+                return ResourceManager.GetString("Home_Welcome", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to E-Mail *.
         /// </summary>

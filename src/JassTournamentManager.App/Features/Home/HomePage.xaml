@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="JassTournamentManager.App.Features.Home.HomePage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:resources="clr-namespace:JassTournamentManager.App.Resources.Localization"
+    xmlns:home="clr-namespace:JassTournamentManager.App.Features.Home"
+    x:DataType="home:HomeViewModel"
+    Title="{x:Static resources:AppResources.Home_Title}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24" Spacing="24" VerticalOptions="Center">
+            <Border
+                Padding="20"
+                StrokeShape="RoundRectangle 18"
+                Style="{StaticResource CardBorder}">
+                <VerticalStackLayout Spacing="16">
+                    <Label
+                        Text="{x:Static resources:AppResources.Home_Welcome}"
+                        FontSize="22"
+                        FontAttributes="Bold" />
+
+                    <Label Text="{Binding DisplayName}" FontSize="18" />
+
+                    <Label
+                        Text="{Binding ErrorMessage}"
+                        IsVisible="{Binding HasError}"
+                        TextColor="{StaticResource AppDanger}" />
+
+                    <ActivityIndicator
+                        IsRunning="{Binding IsBusy}"
+                        IsVisible="{Binding IsBusy}"
+                        HorizontalOptions="Center" />
+
+                    <Button
+                        Text="{x:Static resources:AppResources.Home_Logout}"
+                        Command="{Binding LogoutCommand}"
+                        IsEnabled="{Binding IsNotBusy}"
+                        Style="{StaticResource SecondaryButton}" />
+                </VerticalStackLayout>
+            </Border>
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

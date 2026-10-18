@@ -1,4 +1,5 @@
 ﻿using JassTournamentManager.App.Features.Authentication;
+using JassTournamentManager.App.Features.Home;
 using JassTournamentManager.App.Infrastructure.Api;
 using JassTournamentManager.App.Infrastructure.Auth;
 using Microsoft.Extensions.Logging;
@@ -23,15 +24,23 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<AppShell>();
 
-        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddSingleton<LoginPage>();
+        builder.Services.AddSingleton<HomePage>();
+        builder.Services.AddSingleton<HomeViewModel>();
 
-        builder.Services.AddTransient<AuthenticationViewModel>();
-        builder.Services.AddTransient<LoginFormViewModel>();
-        builder.Services.AddTransient(_ => new RegisterFlowViewModel());
+        builder.Services.AddSingleton<AuthenticationViewModel>();
+        builder.Services.AddSingleton<LoginFormViewModel>();
+        builder.Services.AddSingleton(_ => new RegisterFlowViewModel());
 
         builder.Services.AddSingleton(new ApiOptions());
         builder.Services.AddSingleton<ISecureStorage>(SecureStorage.Default);
         builder.Services.AddSingleton<ITokenStore, SecureTokenStore>();
+        builder.Services.AddSingleton<IAuthSession, AuthSession>();
+        builder.Services.AddHttpClient<IAuthApiClient, AuthApiClient>((serviceProvider, httpClient) =>
+        {
+            httpClient.BaseAddress = serviceProvider.GetRequiredService<ApiOptions>().BaseAddress;
+            httpClient.Timeout = TimeSpan.FromSeconds(15);
+        });
         builder.Services.AddTransient<AuthenticatingHttpHandler>();
 
         builder.Services

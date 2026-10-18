@@ -48,12 +48,14 @@
 
                     <Button
                         Text="{x:Static resources:AppResources.Auth_SwitchToRegister}"
+                        IsEnabled="{Binding LoginForm.IsNotBusy}"
                         IsVisible="{Binding IsLoginMode}"
                         Command="{Binding ShowRegisterCommand}"
                         Style="{StaticResource SecondaryButton}" />
 
                     <Button
                         Text="{x:Static resources:AppResources.Auth_SwitchToLogin}"
+                        IsEnabled="{Binding LoginForm.IsNotBusy}"
                         IsVisible="{Binding IsRegisterMode}"
                         Command="{Binding ShowLoginCommand}"
                         Style="{StaticResource SecondaryButton}" />

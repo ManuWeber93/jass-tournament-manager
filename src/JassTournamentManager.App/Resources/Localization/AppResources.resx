@@ -225,4 +225,37 @@
   <data name="Register_ErrorMessage_RegisterFormInvalid" xml:space="preserve">
     <value>Bitte prüfe deine obigen Angaben.</value>
   </data>
+  <data name="Auth_InvalidInput" xml:space="preserve">
+    <value>Bitte prüfe deine Eingaben.</value>
+  </data>
+  <data name="Auth_InvalidCredentials" xml:space="preserve">
+    <value>Die E-Mail-Adresse oder das Passwort ist falsch.</value>
+  </data>
+  <data name="Auth_NetworkError" xml:space="preserve">
+    <value>Die Verbindung zum Server ist fehlgeschlagen. Bitte prüfe deine Internetverbindung und versuche es erneut.</value>
+  </data>
+  <data name="Auth_ServerError" xml:space="preserve">
+    <value>Der Server ist derzeit nicht verfügbar. Bitte versuche es später erneut.</value>
+  </data>
+  <data name="Auth_InvalidResponse" xml:space="preserve">
+    <value>Die Antwort des Servers konnte nicht verarbeitet werden. Bitte versuche es erneut.</value>
+  </data>
+  <data name="Auth_StorageError" xml:space="preserve">
+    <value>Die Anmeldedaten konnten auf diesem Gerät nicht gespeichert oder entfernt werden. Bitte versuche es erneut.</value>
+  </data>
+  <data name="Auth_UnexpectedError" xml:space="preserve">
+    <value>Ein unerwarteter Fehler ist aufgetreten. Bitte versuche es erneut.</value>
+  </data>
+  <data name="Auth_LogoutRemoteFailed" xml:space="preserve">
+    <value>Du wurdest auf diesem Gerät abgemeldet. Die Sitzung auf dem Server konnte jedoch nicht widerrufen werden.</value>
+  </data>
+  <data name="Home_Title" xml:space="preserve">
+    <value>Startseite</value>
+  </data>
+  <data name="Home_Welcome" xml:space="preserve">
+    <value>Willkommen!</value>
+  </data>
+  <data name="Home_Logout" xml:space="preserve">
+    <value>Abmelden</value>
+  </data>
 </root>
