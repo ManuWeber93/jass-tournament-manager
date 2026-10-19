@@ -27,7 +27,7 @@ public class RegisterCommandTests
     }
 
     [Fact]
-    public async Task RegisterCommand_Success_NormalizesNamesAndEmailPreservesPasswordAndClearsBothPasswords()
+    public async Task RegisterCommand_Success_NormalizesRequestAndPreservesInputsUntilPageReplacement()
     {
         var response = AuthTestData.CreateResponse(AuthTestData.CreateTokens());
         var session = new FakeAuthSession
@@ -53,8 +53,11 @@ public class RegisterCommandTests
         call.Request.LastName.Should().Be(lastName);
         call.Request.Password.Should().Be(password);
         call.Request.ClaimedUserId.Should().BeNull();
-        viewModel.RegisterPassword.Should().BeEmpty();
-        viewModel.ConfirmPassword.Should().BeEmpty();
+        viewModel.Email.Should().Be($"  {email}  ");
+        viewModel.FirstName.Should().Be($"  {firstName}  ");
+        viewModel.LastName.Should().Be($"  {lastName}  ");
+        viewModel.RegisterPassword.Should().Be(password);
+        viewModel.ConfirmPassword.Should().Be(password);
         viewModel.InvalidRegisterFormErrorMessage.Should().BeEmpty();
         viewModel.IsRegisterFormInvalid.Should().BeFalse();
         viewModel.IsBusy.Should().BeFalse();

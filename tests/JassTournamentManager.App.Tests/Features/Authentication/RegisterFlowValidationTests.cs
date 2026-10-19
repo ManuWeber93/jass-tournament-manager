@@ -17,6 +17,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void Passwords_WithMissingOrMatchingValues_DoNotShowMismatch(string password, string confirmation)
         {
             var viewModel = CreateValidViewModel();
+            viewModel.ValidatePasswordConfirmationCommand.Execute(null);
 
             viewModel.RegisterPassword = password;
             viewModel.ConfirmPassword = confirmation;
@@ -28,9 +29,10 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         [Theory]
         [InlineData(true)]
         [InlineData(false)]
-        public void Passwords_WhenEitherValueChangesToMismatch_ShowResourceMessage(bool changePassword)
+        public void Passwords_AfterConfirmationWasLeft_WhenEitherValueChangesToMismatch_ShowResourceMessage(bool changePassword)
         {
             var viewModel = CreateValidViewModel();
+            viewModel.ValidatePasswordConfirmationCommand.Execute(null);
 
             if (changePassword)
             {
@@ -53,7 +55,9 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void Passwords_WhenMismatchIsCorrectedOrValueCleared_ClearError(bool changePassword, bool clearValue)
         {
             var viewModel = CreateValidViewModel();
+            viewModel.ValidatePasswordConfirmationCommand.Execute(null);
             viewModel.ConfirmPassword = "Different12!";
+            viewModel.IsRegisterPasswordMismatch.Should().BeTrue();
 
             if (changePassword)
             {
@@ -72,6 +76,7 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
         public void PasswordMismatch_WhenIntroducedAndCorrected_NotifiesMessageAndFlag()
         {
             var viewModel = CreateValidViewModel();
+            viewModel.ValidatePasswordConfirmationCommand.Execute(null);
             var changedProperties = new List<string?>();
             viewModel.PropertyChanged += (_, args) => changedProperties.Add(args.PropertyName);
 
@@ -207,6 +212,42 @@ namespace JassTournamentManager.App.Tests.Features.Authentication
             viewModel.IsRegisterFormInvalid.Should().BeFalse();
             changedProperties.Count(name => name == nameof(RegisterFlowViewModel.InvalidRegisterFormErrorMessage)).Should().Be(2);
             changedProperties.Count(name => name == nameof(RegisterFlowViewModel.IsRegisterFormInvalid)).Should().Be(2);
+        }
+
+        [Fact]
+        public void PasswordMismatch_BeforeConfirmationWasLeft_DoesNotShowError()
+        {
+            var viewModel = CreateValidViewModel();
+
+            viewModel.ConfirmPassword = "Different12!";
+
+            viewModel.RegisterPasswordMismatchErrorMessage.Should().BeEmpty();
+            viewModel.IsRegisterPasswordMismatch.Should().BeFalse();
+
+            viewModel.ValidatePasswordConfirmationCommand.Execute(null);
+
+            viewModel.RegisterPasswordMismatchErrorMessage.Should().Be(AppResources.Register_ErrorMessage_PasswordMismatch);
+            viewModel.IsRegisterPasswordMismatch.Should().BeTrue();
+        }
+
+        [Fact]
+        public void PasswordMismatch_AfterReset_WaitsForConfirmationToBeLeftAgain()
+        {
+            var viewModel = CreateValidViewModel();
+            viewModel.ConfirmPassword = "Different12!";
+            viewModel.ValidatePasswordConfirmationCommand.Execute(null);
+            viewModel.IsRegisterPasswordMismatch.Should().BeTrue();
+
+            viewModel.Reset();
+            viewModel.RegisterPassword = "Secret12!";
+            viewModel.ConfirmPassword = "Different12!";
+
+            viewModel.RegisterPasswordMismatchErrorMessage.Should().BeEmpty();
+            viewModel.IsRegisterPasswordMismatch.Should().BeFalse();
+
+            viewModel.ValidatePasswordConfirmationCommand.Execute(null);
+
+            viewModel.IsRegisterPasswordMismatch.Should().BeTrue();
         }
 
         private static RegisterFlowViewModel CreateValidViewModel()

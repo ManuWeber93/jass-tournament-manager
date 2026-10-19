@@ -30,7 +30,7 @@ The 200-character password maximum mirrors the existing registration contract. T
 2. The user enters the required details and submits the form.
 3. While the request is running, inputs are disabled and duplicate submissions are prevented.
 4. After account creation and successful session storage, the user is signed in automatically and sees the home screen with their name. No separate login is needed.
-5. Password and confirmation are cleared.
+5. Only after the home screen replaces the authentication page, both authentication forms are cleared, including all input fields, participant selection, search filters and error messages. Registration returns to its first step. The authentication form switches back to login in the background, so a subsequent logout shows an empty login form without stale validation messages.
 
 ### Validation and Failure Cases
 
@@ -47,6 +47,15 @@ The 200-character password maximum mirrors the existing registration contract. T
 - Missing credentials are subject to form validation; incorrect credentials produce an authentication error.
 - Inputs are disabled while login is running.
 - Successful login opens the home screen showing the user's name after session storage succeeds.
+- Successful login clears both authentication forms and their error messages, including unfinished registration input, only after the home screen replaces the login page. Entered values remain unchanged until the page switch, so no empty fields or reset-induced validation errors flash during the transition. A subsequent logout shows an empty login form without stale field-validation messages; a new remote-logout warning is still displayed when applicable.
+
+## Field Validation Timing
+
+- Login and registration fields do not show field-validation errors while the user is entering a value for the first time.
+- Leaving a field for the first time enables its validation messages. Subsequent edits update those messages immediately, allowing corrections without leaving the field again.
+- Password mismatch feedback starts only after leaving the password confirmation field for the first time.
+- Submitting a form still validates all required input and prevents invalid requests, including untouched fields.
+- After successful authentication, resetting the forms also resets this interaction state for the next login or registration.
 
 ## Password Visibility
 

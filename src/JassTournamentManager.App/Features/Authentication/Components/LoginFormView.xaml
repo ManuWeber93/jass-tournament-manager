@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:resources="clr-namespace:JassTournamentManager.App.Resources.Localization"
+    xmlns:components="clr-namespace:JassTournamentManager.App.Features.Authentication.Components"
     xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
     xmlns:validation="clr-namespace:InputKit.Shared.Validations;assembly=InputKit.Maui"
     xmlns:input="clr-namespace:InputKit.Shared.Controls;assembly=InputKit.Maui">
@@ -15,17 +16,17 @@
         FontSize="22"
         FontAttributes="Bold" />
 
-        <material:TextField Title="{x:Static resources:AppResources.Login_Email}" Text="{Binding Email}" Keyboard="Email" IsEnabled="{Binding IsNotBusy}">
+        <components:DeferredValidationTextField Title="{x:Static resources:AppResources.Login_Email}" Text="{Binding Email}" Keyboard="Email" IsEnabled="{Binding IsNotBusy}">
             <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_EmailRequired}" />
             <validation:RegexValidation Pattern="{x:Static input:AdvancedEntry.REGEX_EMAIL}" />
-        </material:TextField>
+        </components:DeferredValidationTextField>
 
-        <material:TextField Title="{x:Static resources:AppResources.Login_Password}" Text="{Binding Password}" IsPassword="True" IsEnabled="{Binding IsNotBusy}">
-            <material:TextField.Attachments>
+        <components:DeferredValidationTextField Title="{x:Static resources:AppResources.Login_Password}" Text="{Binding Password}" IsPassword="True" IsEnabled="{Binding IsNotBusy}">
+            <components:DeferredValidationTextField.Attachments>
                 <material:TextFieldPasswordShowHideAttachment SemanticProperties.Description="{x:Static resources:AppResources.Auth_TogglePasswordVisibility}" />
-            </material:TextField.Attachments>
+            </components:DeferredValidationTextField.Attachments>
             <validation:RequiredValidation Message="{x:Static resources:AppResources.Register_ErrorMessage_PasswordRequired}" />
-        </material:TextField>
+        </components:DeferredValidationTextField>
 
         <Label
             Text="{Binding ErrorMessage}"

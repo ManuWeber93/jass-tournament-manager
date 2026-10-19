@@ -30,7 +30,9 @@ public class AuthenticationFlowTests
         var storage = new FakeSecureStorage();
         var store = new SecureTokenStore(storage);
         var session = new AuthSession(new AuthApiClient(http), store);
-        var login = new LoginFormViewModel(session) { Email = response.User.Email!, Password = "Secret123!" };
+        const string password = "Secret123!";
+        var login = new LoginFormViewModel(session) { Email = response.User.Email!, Password = password };
+        var authentication = new AuthenticationViewModel(login, new RegisterFlowViewModel(session));
         var home = new HomeViewModel(session);
 
         await login.LoginCommand.ExecuteAsync(null);
@@ -38,6 +40,13 @@ public class AuthenticationFlowTests
         session.CurrentUser.Should().BeEquivalentTo(response.User);
         (await store.GetTokensAsync()).Should().Be(tokens);
         home.DisplayName.Should().Be($"{response.User.FirstName} {response.User.LastName}");
+        login.Email.Should().Be(response.User.Email);
+        login.Password.Should().Be(password);
+
+        // The shell resets the forms only after replacing the authentication page.
+        authentication.ResetAfterAuthentication();
+
+        login.Email.Should().BeEmpty();
         login.Password.Should().BeEmpty();
 
         await home.LogoutCommand.ExecuteAsync(null);

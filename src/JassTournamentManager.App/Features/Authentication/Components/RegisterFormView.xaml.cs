@@ -6,5 +6,13 @@
         {
             InitializeComponent();
         }
+
+        private void OnPasswordConfirmationValidationActivated(object? sender, EventArgs e)
+        {
+            if (BindingContext is RegisterFlowViewModel viewModel)
+            {
+                viewModel.ValidatePasswordConfirmationCommand.Execute(null);
+            }
+        }
     }
 }

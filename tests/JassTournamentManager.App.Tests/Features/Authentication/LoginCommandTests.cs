@@ -50,7 +50,7 @@ public class LoginCommandTests
     }
 
     [Fact]
-    public async Task LoginCommand_Success_TrimsEmailPreservesPasswordInRequestAndClearsPassword()
+    public async Task LoginCommand_Success_NormalizesRequestAndPreservesInputsUntilPageReplacement()
     {
         var response = AuthTestData.CreateResponse(AuthTestData.CreateTokens());
         var session = new FakeAuthSession
@@ -69,7 +69,8 @@ public class LoginCommandTests
         var call = session.LoginCalls.Should().ContainSingle().Subject;
         call.Request.Email.Should().Be(email);
         call.Request.Password.Should().Be(password);
-        viewModel.Password.Should().BeEmpty();
+        viewModel.Email.Should().Be($"  {email}  ");
+        viewModel.Password.Should().Be(password);
         viewModel.ErrorMessage.Should().BeEmpty();
         viewModel.HasError.Should().BeFalse();
     }

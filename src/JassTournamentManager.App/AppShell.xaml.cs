@@ -43,5 +43,10 @@ public partial class AppShell : Shell
             Route = isAuthenticated ? "Home" : "Login",
             Content = isAuthenticated ? homePage : loginPage
         });
+
+        if (isAuthenticated)
+        {
+            loginPage.ResetAfterAuthentication();
+        }
     }
 }

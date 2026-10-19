@@ -152,7 +152,9 @@ This section describes the technical implementation. User-visible behavior and c
 
 Local API configuration:
 
-- `ApiOptions` selects `localhost:5272` on Windows and `10.0.2.2:5272` for the Android emulator.
+- `ApiOptions` selects `http://localhost:8080` for Android Debug builds, using ADB reverse port forwarding to the Compose API. See [Android USB setup](testing/authentication.md#android-device-over-usb) for the required commands; this also applies when running an emulator with the Debug configuration.
+- Other Android builds retain the existing emulator development endpoint `http://10.0.2.2:5272`; non-Android builds use `http://localhost:5272`. These are development defaults, not production endpoints.
+- Android Debug builds explicitly allow cleartext HTTP through the application attribute. Other configurations do not enable this exception.
 - Device connectivity and platform HTTP/HTTPS settings must be configured for the target environment.
 
 ---

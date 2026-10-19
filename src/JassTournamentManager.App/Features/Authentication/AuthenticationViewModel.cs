@@ -16,6 +16,16 @@ namespace JassTournamentManager.App.Features.Authentication
             RegisterFlow = registerFlow;
         }
 
+        public event EventHandler? FormsReset;
+
+        public void ResetAfterAuthentication()
+        {
+            LoginForm.Reset();
+            RegisterFlow.Reset();
+            IsRegisterMode = false;
+            FormsReset?.Invoke(this, EventArgs.Empty);
+        }
+
         public LoginFormViewModel LoginForm { get; }
 
         public RegisterFlowViewModel RegisterFlow { get; }

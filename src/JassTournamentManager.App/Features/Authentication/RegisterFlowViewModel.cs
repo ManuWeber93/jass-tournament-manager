@@ -13,6 +13,8 @@ namespace JassTournamentManager.App.Features.Authentication
     {
         private readonly IAuthSession session;
 
+        private bool isPasswordConfirmationValidationEnabled;
+
         private readonly List<ClaimableUserListItem> allClaimableUsers = new();
 
         private readonly Regex PasswordRegex = new(PasswordPattern, RegexOptions.CultureInvariant, TimeSpan.FromMilliseconds(250));
@@ -170,7 +172,6 @@ namespace JassTournamentManager.App.Features.Authentication
         {
             if (result.Session is not null)
             {
-                ClearPasswords();
                 return;
             }
 
@@ -188,6 +189,20 @@ namespace JassTournamentManager.App.Features.Authentication
                 AuthFailure.InvalidResponse => AppResources.Register_InvalidResponse,
                 _ => AppResources.Auth_ServerError
             };
+        }
+
+        public void Reset()
+        {
+            isPasswordConfirmationValidationEnabled = false;
+            Email = string.Empty;
+            FirstName = string.Empty;
+            LastName = string.Empty;
+            ClearPasswords();
+            ClaimableUsersFilterText = string.Empty;
+            SelectedClaimableUser = null;
+            CurrentRegisterStep = RegisterStep.PreviousParticipationQuestion;
+            RegisterPasswordMismatchErrorMessage = string.Empty;
+            InvalidRegisterFormErrorMessage = string.Empty;
         }
 
         private void ClearPasswords()
@@ -259,8 +274,20 @@ namespace JassTournamentManager.App.Features.Authentication
             CurrentRegisterStep = RegisterStep.RegistrationForm;
         }
 
+        [RelayCommand]
+        private void ValidatePasswordConfirmation()
+        {
+            isPasswordConfirmationValidationEnabled = true;
+            ValidateIfPasswordsMatch();
+        }
+
         private void ValidateIfPasswordsMatch()
         {
+            if (!isPasswordConfirmationValidationEnabled)
+            {
+                return;
+            }
+
             if (RegisterPassword == string.Empty || ConfirmPassword == string.Empty)
             {
                 RegisterPasswordMismatchErrorMessage = string.Empty;

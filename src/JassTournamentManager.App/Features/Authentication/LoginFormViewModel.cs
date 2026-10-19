@@ -43,6 +43,13 @@ namespace JassTournamentManager.App.Features.Authentication
             };
         }
 
+        public void Reset()
+        {
+            Email = string.Empty;
+            Password = string.Empty;
+            ErrorMessage = string.Empty;
+        }
+
         private bool CanLogin() => !IsBusy;
 
         [RelayCommand(CanExecute = nameof(CanLogin))]
@@ -102,7 +109,6 @@ namespace JassTournamentManager.App.Features.Authentication
         {
             if (result.Session is not null)
             {
-                Password = string.Empty;
                 return;
             }
 

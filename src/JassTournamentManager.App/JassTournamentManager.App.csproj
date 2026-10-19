@@ -85,6 +85,7 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
 		<Compile Remove="Platforms\**\*.cs;**\*.xaml.cs;MauiProgram.cs" />
+		<Compile Remove="Features\Authentication\Components\DeferredValidationTextField.cs" />
 	</ItemGroup>
 
 	<ItemGroup>

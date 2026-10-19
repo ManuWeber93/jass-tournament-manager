@@ -18,7 +18,9 @@ public sealed class ApiOptionsTests
     [Fact]
     public void BaseAddress_ByDefault_UsesPlatformDevelopmentEndpoint()
     {
-#if ANDROID
+#if ANDROID && DEBUG
+        var expected = new Uri("http://localhost:8080");
+#elif ANDROID
         var expected = new Uri("http://10.0.2.2:5272");
 #else
         var expected = new Uri("http://localhost:5272");

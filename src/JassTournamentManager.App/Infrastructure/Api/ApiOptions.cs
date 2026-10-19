@@ -8,7 +8,9 @@ public sealed class ApiOptions
 
     private static string GetDefaultBaseAddress()
     {
-#if ANDROID
+#if ANDROID && DEBUG
+        return "http://localhost:8080";
+#elif ANDROID
         return "http://10.0.2.2:5272";
 #else
         return "http://localhost:5272";
