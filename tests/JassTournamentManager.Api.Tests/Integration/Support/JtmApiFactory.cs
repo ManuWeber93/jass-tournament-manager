@@ -1,5 +1,6 @@
 ﻿using JassTournamentManager.Application.Auth;
 using JassTournamentManager.Application.TournamentTemplates;
+using JassTournamentManager.Application.Tournaments;
 using JassTournamentManager.Application.Users;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
@@ -43,6 +44,7 @@ namespace JassTournamentManager.Api.Tests.Integration.Support
         {
             ReplaceWithSingleton<IAuthService>(services, FakeServices.AuthService);
             ReplaceWithSingleton<ITournamentTemplateService>(services, FakeServices.TournamentTemplateService);
+            ReplaceWithSingleton<ITournamentService>(services, FakeServices.TournamentService);
             ReplaceWithSingleton<IUserService>(services, FakeServices.UserService);
         }
 

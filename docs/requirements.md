@@ -47,6 +47,7 @@ Tournament
               
 
 ### Tournaments
+- Backend creation behavior and API scope are documented in [Tournament Creation](features/tournament-creation.md).
 - Belong to an organizer
 - Can be recurring events
 - Reports across all tournaments of an organizer

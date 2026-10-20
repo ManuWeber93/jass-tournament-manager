@@ -1,5 +1,6 @@
 ﻿using JassTournamentManager.Application.Auth;
 using JassTournamentManager.Application.Common;
+using JassTournamentManager.Application.Tournaments;
 using JassTournamentManager.Application.TournamentTemplates;
 using JassTournamentManager.Application.Users;
 using JassTournamentManager.Infrastructure.Auth;
@@ -20,6 +21,7 @@ namespace JassTournamentManager.Infrastructure
                     npgsql => npgsql.MigrationsHistoryTable("__EFMigrationsHistory", "jtm")));
 
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ITournamentRepository, TournamentRepository>();
             services.AddScoped<ITournamentTemplateRepository, TournamentTemplateRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();

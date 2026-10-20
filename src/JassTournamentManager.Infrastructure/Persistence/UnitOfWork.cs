@@ -1,4 +1,7 @@
 ﻿using JassTournamentManager.Application.Common;
+using JassTournamentManager.Application.Tournaments;
+using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace JassTournamentManager.Infrastructure.Persistence
 {
@@ -11,9 +14,21 @@ namespace JassTournamentManager.Infrastructure.Persistence
             _dbContext = dbContext;
         }
 
-        public Task<int> SaveChangesAsync(CancellationToken cancellationToken)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
-            return _dbContext.SaveChangesAsync(cancellationToken);
+            try
+            {
+                return await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateException exception) when (
+                exception.InnerException is PostgresException
+                {
+                    SqlState: PostgresErrorCodes.UniqueViolation,
+                    ConstraintName: "ux_tournaments_tournament_code"
+                })
+            {
+                throw new TournamentCodeConflictException(exception);
+            }
         }
     }
 }
